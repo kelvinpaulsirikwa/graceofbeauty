@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WebsiteControllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Models\LeadershipTeam;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -16,8 +17,9 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::with('serviceImages.creator')->orderBy('order')->get();
+        $leadershipTeams = LeadershipTeam::latest()->get();
         
-        return view('websitepages.services.index', compact('services'));
+        return view('websitepages.services.index', compact('services', 'leadershipTeams'));
     }
 
     /**

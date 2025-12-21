@@ -6,24 +6,116 @@
     use Illuminate\Support\Facades\Storage;
 @endphp
 
+@push('styles')
+<style>
+    /* Hero Banner Section */
+    .services-hero {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        background-image: url("{{ asset('images/static_image/aboutus.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .services-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(212, 175, 55, 0.3); /* Semi-transparent gold overlay with reduced opacity */
+        z-index: 1;
+    }
+
+    .services-hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .breadcrumb {
+        font-size: 14px;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+
+    .breadcrumb a {
+        color: white;
+        text-decoration: none;
+        transition: opacity 0.3s;
+    }
+
+    .breadcrumb a:hover {
+        opacity: 0.7;
+    }
+
+    .services-hero-title {
+        font-size: 72px;
+        font-weight: 700;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .services-hero {
+            height: 400px;
+        }
+
+        .services-hero-title {
+            font-size: 48px;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .services-hero {
+            height: 350px;
+        }
+
+        .services-hero-title {
+            font-size: 36px;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
+
+<!-- Hero Banner Section -->
+<section class="services-hero">
+    <div class="services-hero-content">
+        <div class="breadcrumb">
+            <a href="{{ route('home') }}">HOME</a> > <span>OUR SERVICES</span> >
+        </div>
+        <h1 class="services-hero-title">Our Services</h1>
+    </div>
+</section>
+
 <!-- Services Section -->
 <section class="services-section py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <!-- Section Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                <span class="relative inline-block">
-                    OUR
-                    <span class="absolute bottom-0 left-0 w-full h-1 bg-red-600"></span>
-                </span>
-                <span class="ml-2">SERVICES</span>
-            </h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                Discover the premium services we offer to enhance your beauty and style.
-            </p>
-        </div>
-
         <!-- Services Grid -->
         @if($services && $services->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -78,6 +170,10 @@
         @endif
     </div>
 </section>
+
+@include('websitepages.aboutus.welcometaboutus')
+
+@include('websitepages.aboutus.meetingourteam', ['leadershipTeams' => $leadershipTeams])
 
 <style>
     .services-section {
