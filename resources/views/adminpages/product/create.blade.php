@@ -1,0 +1,280 @@
+@extends('adminpages.layouts.app')
+
+@section('content')
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Create New Product</h2>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+            <i class="bx bx-arrow-back"></i> Back to List
+        </a>
+    </div>
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
+                @csrf
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Product Name</label>
+                    <input 
+                        type="text" 
+                        class="form-control @error('name') is-invalid @enderror" 
+                        id="name" 
+                        name="name" 
+                        value="{{ old('name') }}" 
+                        placeholder="Enter product name"
+                        maxlength="255"
+                    >
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="form-text">Enter the product name (optional)</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="brand_id" class="form-label">Brand</label>
+                            <select class="form-select @error('brand_id') is-invalid @enderror" id="brand_id" name="brand_id">
+                                <option value="">Select Brand (Optional)</option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->brand_id }}" {{ old('brand_id') == $brand->brand_id ? 'selected' : '' }}>
+                                        {{ $brand->brand_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('brand_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
+                                <option value="">Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->category_id }}" {{ old('category_id') == $category->category_id ? 'selected' : '' }}>
+                                        {{ $category->category_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('category_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="subcategory_id" class="form-label">Subcategory</label>
+                            <select class="form-select @error('subcategory_id') is-invalid @enderror" id="subcategory_id" name="subcategory_id">
+                                <option value="">Select Subcategory (Optional)</option>
+                                @foreach($subcategories as $subcategory)
+                                    <option value="{{ $subcategory->subcategory_id }}" 
+                                        data-category-id="{{ $subcategory->category_id }}"
+                                        {{ old('subcategory_id') == $subcategory->subcategory_id ? 'selected' : '' }}>
+                                        {{ $subcategory->subcategory_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('subcategory_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Subcategories will be filtered based on selected category.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="front_image" class="form-label">Front Image</label>
+                            <input 
+                                type="file" 
+                                class="form-control @error('front_image') is-invalid @enderror" 
+                                id="front_image" 
+                                name="front_image" 
+                                accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                            >
+                            @error('front_image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Upload front image (Max: 2MB, Formats: JPEG, PNG, JPG, GIF, WEBP)</div>
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImg" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input 
+                                type="number" 
+                                step="0.01" 
+                                min="0" 
+                                max="99999999.99"
+                                class="form-control @error('price') is-invalid @enderror" 
+                                id="price" 
+                                name="price" 
+                                value="{{ old('price') }}" 
+                                placeholder="0.00"
+                            >
+                            @error('price')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Enter product price (optional)</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check mt-4">
+                                <input 
+                                    class="form-check-input @error('available') is-invalid @enderror" 
+                                    type="checkbox" 
+                                    id="available" 
+                                    name="available" 
+                                    value="1"
+                                    {{ old('available', true) ? 'checked' : '' }}
+                                >
+                                <label class="form-check-label" for="available">
+                                    Available
+                                </label>
+                                @error('available')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-text">Check if the product is available for sale</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label mb-0">Product Attributes</label>
+                        <button type="button" class="btn btn-sm btn-success" id="addAttributeBtn">
+                            <i class="bx bx-plus"></i> Add Attribute
+                        </button>
+                    </div>
+                    <div id="attributesContainer">
+                        <!-- Dynamic attributes will be added here -->
+                    </div>
+                    <div class="form-text">Add product attributes with their values (e.g., Color: Red, Size: Large)</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save"></i> Create Product
+                    </button>
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let attributeIndex = 0;
+    const productAttributes = @json($productAttributes);
+
+    // Image preview
+    document.getElementById('front_image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+    });
+
+    // Filter subcategories based on selected category
+    document.getElementById('category_id').addEventListener('change', function() {
+        const categoryId = this.value;
+        const subcategorySelect = document.getElementById('subcategory_id');
+        const options = subcategorySelect.querySelectorAll('option[data-category-id]');
+        
+        // Reset subcategory
+        subcategorySelect.value = '';
+        
+        options.forEach(option => {
+            if (categoryId && option.getAttribute('data-category-id') === categoryId) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    });
+
+    // Add attribute row
+    document.getElementById('addAttributeBtn').addEventListener('click', function() {
+        addAttributeRow();
+    });
+
+    function addAttributeRow(attributeId = '', value = '') {
+        const container = document.getElementById('attributesContainer');
+        const row = document.createElement('div');
+        row.className = 'row mb-2 attribute-row';
+        row.innerHTML = `
+            <div class="col-md-5">
+                <select class="form-select attribute-select" name="product_attributes[${attributeIndex}][attribute_id]" required>
+                    <option value="">Select Attribute</option>
+                    ${productAttributes.map(attr => 
+                        `<option value="${attr.id}" ${attributeId == attr.id ? 'selected' : ''}>${attr.name}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="text" class="form-control" name="product_attributes[${attributeIndex}][value]" 
+                    placeholder="Enter value" value="${value}" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-sm btn-danger remove-attribute" title="Remove">
+                    <i class="bx bx-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(row);
+        
+        // Add remove functionality
+        row.querySelector('.remove-attribute').addEventListener('click', function() {
+            row.remove();
+        });
+        
+        attributeIndex++;
+    }
+
+    // Remove attribute row
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-attribute')) {
+            e.target.closest('.attribute-row').remove();
+        }
+    });
+
+    // Initialize with one empty row if no old input
+    @if(old('product_attributes'))
+        @foreach(old('product_attributes') as $index => $attr)
+            addAttributeRow('{{ $attr['attribute_id'] ?? '' }}', '{{ $attr['value'] ?? '' }}');
+        @endforeach
+    @else
+        addAttributeRow();
+    @endif
+</script>
+@endsection
+

@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('leadership_teams', function (Blueprint $table) {
+            $table->id('leadership_team_id');
+            $table->string('name');
+            $table->string('rank');
+            $table->string('phonenumber')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('gmail')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('description', 150);
+            $table->foreignId('created_by')->constrained('users')->onDelete('restrict');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('leadership_teams');
+    }
+};
