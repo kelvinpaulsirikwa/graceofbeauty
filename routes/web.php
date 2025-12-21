@@ -8,6 +8,7 @@ use App\Http\Controllers\WebsiteControllers\MadeForYouController;
 use App\Http\Controllers\WebsiteControllers\ProductController as WebsiteProductController;
 use App\Http\Controllers\WebsiteControllers\CategoryController as WebsiteCategoryController;
 use App\Http\Controllers\WebsiteControllers\ServiceController as WebsiteServiceController;
+use App\Http\Controllers\WebsiteControllers\GalleryController as WebsiteGalleryController;
 use App\Http\Controllers\AdminControllers\AuthController;
 use App\Http\Controllers\AdminControllers\DashboardController;
 use App\Http\Controllers\AdminControllers\CategoryController;
@@ -32,9 +33,9 @@ Route::post('/api/products/filter', [HomeController::class, 'filterProducts'])->
 Route::get('/product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
 Route::get('/category/{id}', [WebsiteCategoryController::class, 'show'])->name('category.show');
 Route::post('/api/category/{categoryId}/products/filter', [WebsiteCategoryController::class, 'filterProducts'])->name('api.category.products.filter');
-Route::get('/product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
 Route::get('/services', [WebsiteServiceController::class, 'index'])->name('services');
 Route::get('/services/{id}', [WebsiteServiceController::class, 'show'])->name('services.show');
+Route::get('/gallery', [WebsiteGalleryController::class, 'index'])->name('gallery');
 Route::get('/made-for-you', [MadeForYouController::class, 'index'])->name('made-for-you');
 Route::get('/about-us', [AboutUsController::class, 'index'])->name('about');
 Route::get('/contact', [ContactUsController::class, 'index'])->name('contact');

@@ -14,7 +14,7 @@
             <nav class="hidden md:flex space-x-6 items-center">
                 <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition">Home</a>
                 <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition">Our Services</a>
-                <a href="#" class="text-gray-700 hover:text-yellow-500 transition">Gallery</a>
+                <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition">Gallery</a>
                 <a href="#" class="text-gray-700 hover:text-yellow-500 transition">Blog</a>
                 <a href="{{ route('about') }}" class="text-gray-700 hover:text-yellow-500 transition">About Us</a>
                 <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition">Contact Us</a>
@@ -69,7 +69,7 @@
                 <div class="flex flex-col space-y-4">
                     <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Home</a>
                     <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Our Services</a>
-                    <a href="#" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Gallery</a>
+                    <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Gallery</a>
                     <a href="#" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Blog</a>
                     <a href="{{ route('about') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">About Us</a>
                     <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Contact Us</a>
