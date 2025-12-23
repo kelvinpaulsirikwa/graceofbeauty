@@ -13,7 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'check.blocked' => \App\Http\Middleware\CheckBlockedUser::class,
+            'check.admin' => \App\Http\Middleware\CheckAdminRole::class,
         ]);
+        
+        // Redirect unauthenticated users to admin login
+        $middleware->redirectGuestsTo(fn () => route('admin.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

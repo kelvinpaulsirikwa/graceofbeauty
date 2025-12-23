@@ -5,6 +5,7 @@ namespace App\Http\Controllers\WebsiteControllers;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\LeadershipTeam;
+use App\Models\UserFeedback;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -19,7 +20,14 @@ class ServiceController extends Controller
         $services = Service::with('serviceImages.creator')->orderBy('order')->get();
         $leadershipTeams = LeadershipTeam::latest()->get();
         
-        return view('websitepages.services.index', compact('services', 'leadershipTeams'));
+        // Fetch 6 random user feedbacks (only those with images)
+        $userFeedbacks = UserFeedback::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->inRandomOrder()
+            ->take(6)
+            ->get();
+        
+        return view('websitepages.services.index', compact('services', 'leadershipTeams', 'userFeedbacks'));
     }
 
     /**

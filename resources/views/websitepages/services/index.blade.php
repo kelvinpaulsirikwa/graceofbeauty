@@ -112,57 +112,62 @@
         <h1 class="services-hero-title">Our Services</h1>
     </div>
 </section>
+@include('websitepages.aboutus.welcometaboutus')
 
 <!-- Services Section -->
 <section class="services-section py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <!-- Services Grid -->
+        <!-- Services Grid with About Layout (Zigzag) -->
         @if($services && $services->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($services as $service)
-                    <a href="{{ route('services.show', $service->service_id) }}" class="service-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block">
-                        <!-- Service Image -->
+            @foreach($services as $index => $service)
+                <section class="service-about-section {{ $index % 2 == 0 ? 'reverse-layout' : '' }}">
+                    <!-- Image Side -->
+                     
+                    <div class="image-container">
                         @if($service->front_image)
-                            <div class="relative h-64 overflow-hidden">
-                                <img 
-                                    src="{{ Storage::url($service->front_image) }}" 
-                                    alt="{{ $service->service_name }}" 
-                                    class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                                >
-                            </div>
+                            <img src="{{ Storage::url($service->front_image) }}" 
+                                 alt="{{ $service->service_name }}" 
+                                 class="professional-image">
                         @elseif($service->serviceImages && $service->serviceImages->count() > 0)
-                            <div class="relative h-64 overflow-hidden">
-                                <img 
-                                    src="{{ Storage::url($service->serviceImages->first()->image_path) }}" 
-                                    alt="{{ $service->service_name }}" 
-                                    class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                                >
-                            </div>
+                            <img src="{{ Storage::url($service->serviceImages->first()->image_path) }}" 
+                                 alt="{{ $service->service_name }}" 
+                                 class="professional-image">
                         @else
-                            <div class="relative h-64 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                                <svg class="w-24 h-24 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
+                            <div class="professional-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: 700;">
+                                {{ strtoupper(substr($service->service_name, 0, 1)) }}
                             </div>
                         @endif
+                    </div>
 
-                        <!-- Service Content -->
-                        <div class="p-6">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-3">{{ $service->service_name }}</h3>
-                            
-                            @if($service->description)
-                                <p class="text-gray-600 mb-4 line-clamp-3">{{ $service->description }}</p>
-                            @endif
+                    <!-- Content Side -->
+                    <div class="content-container">
+                        <p class="section-label">About {{ $service->service_name }}</p>
+                        
+                        <h1 class="main-heading">
+                            {{ $service->service_name }}
+                        </h1>
 
-                            @if($service->serviceImages && $service->serviceImages->count() > 0)
-                                <div class="text-sm text-gray-500">
-                                    <p>{{ $service->serviceImages->count() }} {{ Str::plural('image', $service->serviceImages->count()) }}</p>
-                                </div>
-                            @endif
-                        </div>
-                    </a>
-                @endforeach
-            </div>
+                        @if($service->description)
+                            @php
+                                // Limit description to approximately 3-4 paragraphs (around 800-1000 characters)
+                                $maxLength = 900;
+                                $description = $service->description;
+                                $truncated = Str::limit($description, $maxLength, '...');
+                            @endphp
+                            <p class="description-text">
+                                {{ $truncated }}
+                            </p>
+                        @else
+                            <p class="description-text">
+                                Discover our premium {{ $service->service_name }} service designed to enhance your beauty and style.
+                            </p>
+                        @endif
+
+                        <a href="{{ route('services.show', $service->service_id) }}" class="cta-button">Learn More</a>
+                    </div>
+                </section>
+                <br>
+            @endforeach
         @else
             <div class="text-center py-12">
                 <p class="text-gray-600 text-lg">No services available at the moment.</p>
@@ -171,28 +176,147 @@
     </div>
 </section>
 
-@include('websitepages.aboutus.welcometaboutus')
 
 @include('websitepages.aboutus.meetingourteam', ['leadershipTeams' => $leadershipTeams])
+
+@include('websitepages.userfeedback.userfeedbackservice', ['userFeedbacks' => $userFeedbacks ?? collect()])
 
 <style>
     .services-section {
         font-family: 'Arial', sans-serif;
     }
-    
-    .service-card {
+
+    .service-about-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+        align-items: start;
+    }
+
+    .service-about-section.reverse-layout .image-container {
+        order: 2;
+    }
+
+    .service-about-section.reverse-layout .content-container {
+        order: 1;
+    }
+
+    .image-container {
+        background: #ffffff;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .professional-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .content-container {
+        padding: 4rem 5rem;
+        max-width: 650px;
+    }
+
+    .section-label {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: #999;
+        margin-bottom: 1rem;
+    }
+
+    .main-heading {
+        font-size: 2.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+    }
+
+    .description-text {
+        font-size: 1rem;
+        line-height: 1.8;
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+   
+
+   
+
+  
+
+
+   
+
+    .cta-button {
+        display: inline-block;
+        padding: 0.875rem 2rem;
+        background: #000;
+        color: var(--gold-color, #D4AF37);
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: all 0.3s ease;
+        margin-top: 1rem;
+        border: none;
+        cursor: pointer;
     }
-    
-    .service-card:hover {
-        transform: translateY(-5px);
+
+    .cta-button:hover {
+        background: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
     }
-    
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+
+    @media (max-width: 1024px) {
+        .service-about-section {
+            grid-template-columns: 1fr;
+        }
+
+        .image-container {
+            min-height: 400px;
+        }
+
+        .professional-image {
+            border-radius: 0;
+        }
+
+        .content-container {
+            padding: 3rem 2rem;
+        }
+
+        .main-heading {
+            font-size: 2.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .content-container {
+            padding: 2rem 1.5rem;
+        }
+
+        .main-heading {
+            font-size: 1.875rem;
+        }
+
+        .image-container {
+            padding: 0;
+        }
+
+        .professional-image {
+            border-radius: 0;
+        }
     }
 </style>
 @endsection

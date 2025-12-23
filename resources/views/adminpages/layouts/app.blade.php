@@ -80,6 +80,14 @@
 
     {{-- Page content --}}
     <div class="main-content" style="flex:1 0 auto;">
+        @if(session('error'))
+            <div class="container-fluid px-4 py-2">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        @endif
         @yield('content')
     </div>
 

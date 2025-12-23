@@ -272,14 +272,14 @@
         left: 0;
         right: 0;
         height: 2px;
-        background-color: #ff0000;
+        background-color: var(--gold-color, #D4AF37);
         transform: scaleX(1);
         transition: transform 0.3s ease;
-        box-shadow: 0 2px 4px rgba(255,0,0,0.3);
+        box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
     }
 
     .btn-shop-now:hover {
-        color: #ffcccc;
+        color: var(--gold-color-dark, #A0821A);
     }
 
     .no-categories {

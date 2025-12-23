@@ -22,7 +22,7 @@
         <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
             <span class="relative inline-block">
                 OUR
-                <span class="absolute bottom-0 left-0 w-full h-1 bg-red-600"></span>
+                <span class="absolute bottom-0 left-0 w-full h-1" style="background-color: var(--gold-color, #D4AF37);"></span>
             </span>
             <span class="ml-2">GALLERY</span>
         </h1>

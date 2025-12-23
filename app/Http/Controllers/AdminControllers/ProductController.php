@@ -32,6 +32,12 @@ class ProductController extends Controller
      */
     public function create()
     {
+        // Only admin can create products
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'You do not have permission to create products.');
+        }
+
         $brands = Brand::orderBy('brand_name')->get();
         $categories = Category::orderBy('category_name')->get();
         $subcategories = Subcategory::orderBy('subcategory_name')->get();
@@ -45,6 +51,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Only admin can store products
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'You do not have permission to create products.');
+        }
+
         $validated = $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'brand_id' => ['nullable', 'exists:brands,brand_id'],
@@ -121,6 +133,12 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
+        // Only admin can edit products
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'You do not have permission to edit products.');
+        }
+
         $product = Product::with(['productAttributeValues.productAttribute', 'productImages'])->findOrFail($id);
         $brands = Brand::orderBy('brand_name')->get();
         $categories = Category::orderBy('category_name')->get();
@@ -135,6 +153,12 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // Only admin can update products
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'You do not have permission to update products.');
+        }
+
         $product = Product::findOrFail($id);
 
         $validated = $request->validate([
@@ -202,6 +226,12 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
+        // Only admin can delete products
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'You do not have permission to delete products.');
+        }
+
         $product = Product::findOrFail($id);
         
         DB::beginTransaction();

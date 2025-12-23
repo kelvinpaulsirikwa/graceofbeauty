@@ -73,7 +73,23 @@
                 <div style="background: #0f172a; padding: 55px 50px; border-radius: 20px;">
                     <h2 style="color: white; font-size: 38px; margin-bottom: 40px; font-weight: 700; line-height: 1.2;">✨ Set Up a Styling Consultation ✨</h2>
                     
-                    <form action="#" method="POST">
+                    @if(session('success'))
+                        <div style="background: #10b981; color: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 15px;">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div style="background: #ef4444; color: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 15px;">
+                            <ul style="margin: 0; padding-left: 20px;">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <form action="{{ route('contact.submit') }}" method="POST">
                         @csrf
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
                             <input type="text" name="name" placeholder="Your Name" required 

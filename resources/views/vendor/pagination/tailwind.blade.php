@@ -9,38 +9,38 @@
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200">
                     Previous
-                </a>
-            @endif
+                        </a>
+                    @endif
 
-            {{-- Pagination Elements --}}
-            @foreach ($elements as $element)
-                {{-- "Three Dots" Separator --}}
-                @if (is_string($element))
+                    {{-- Pagination Elements --}}
+                    @foreach ($elements as $element)
+                        {{-- "Three Dots" Separator --}}
+                        @if (is_string($element))
                     <span class="px-4 py-2 text-sm font-medium text-gray-700">{{ $element }}</span>
-                @endif
+                        @endif
 
-                {{-- Array Of Links --}}
-                @if (is_array($element))
-                    @foreach ($element as $page => $url)
-                        @if ($page == $paginator->currentPage())
+                        {{-- Array Of Links --}}
+                        @if (is_array($element))
+                            @foreach ($element as $page => $url)
+                                @if ($page == $paginator->currentPage())
                             <span class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg cursor-default">
                                 {{ $page }}
-                            </span>
-                        @else
+                                    </span>
+                                @else
                             <a href="{{ $url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                                {{ $page }}
-                            </a>
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
                         @endif
                     @endforeach
-                @endif
-            @endforeach
 
-            {{-- Next Page Link --}}
-            @if ($paginator->hasMorePages())
+                    {{-- Next Page Link --}}
+                    @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200">
                     Next
-                </a>
-            @else
+                        </a>
+                    @else
                 <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
                     Next
                 </span>

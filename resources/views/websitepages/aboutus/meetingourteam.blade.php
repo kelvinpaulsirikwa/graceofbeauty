@@ -54,12 +54,12 @@
     }
 
     .team-card:hover .team-card-content {
-        background: #3b82f6;
+        background: var(--gold-color, #D4AF37);
         color: white;
         border-radius: 12px;
         padding: 30px 20px;
         margin-top: -40px;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
     }
 
     .team-card:hover .team-name {
@@ -113,7 +113,7 @@
 
     .team-rank {
         font-size: 13px;
-        color: #3b82f6;
+        color: var(--gold-color, #D4AF37);
         margin-bottom: 20px;
         font-weight: 600;
         text-transform: uppercase;
@@ -144,7 +144,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #3b82f6;
+        background: var(--gold-color, #D4AF37);
         color: white;
         text-decoration: none;
         transition: all 0.3s;
@@ -153,7 +153,7 @@
 
     .team-card:hover .social-link {
         background: white;
-        color: #3b82f6;
+        color: var(--gold-color, #D4AF37);
     }
 
     .social-link:hover {

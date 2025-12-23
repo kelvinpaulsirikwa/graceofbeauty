@@ -81,19 +81,7 @@
             </a>
         </li>
 
-        <li class="divider" data-text="Finance Management"></li>
-        <li>
-            <a href="#">
-                <i class="bx bx-transfer icon"></i>
-                Finance Transactions
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="bx bx-bar-chart-square icon"></i>
-                Finance Reports
-            </a>
-        </li>
+        @if($role === 'admin')
         <li class="divider" data-text="Content Management"></li>
         <li>
             <a href="{{ route('admin.categories.index') }}">
@@ -120,12 +108,6 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('admin.products.index') }}">
-                <i class="bx bx-package icon"></i>
-                Products
-            </a>
-        </li>
-        <li>
             <a href="{{ route('admin.leadership_teams.index') }}">
                 <i class="bx bx-group icon"></i>
                 Leadership Team
@@ -137,11 +119,45 @@
                 Services
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.payments.index') }}">
+                <i class="bx bx-credit-card icon"></i>
+                Payments
+            </a>
+        </li>
+            <li>
+                <a href="{{ route('admin.consultations.index') }}">
+                    <i class="bx bx-message-rounded-detail icon"></i>
+                    Consultations
+                    @php
+                        $unreadConsultations = \App\Models\Consultation::where('read', false)->count();
+                    @endphp
+                    @if($unreadConsultations > 0)
+                        <span class="badge bg-danger ms-2">{{ $unreadConsultations }}</span>
+                    @endif
+                </a>
+            </li>
         <li class="divider" data-text="User Management"></li>
         <li>
             <a href="{{ route('admin.users.index') }}">
                 <i class="bx bx-user icon"></i>
                 Users
+                </a>
+            </li>
+        @endif
+
+        <!-- Products - accessible by both admin and user -->
+        <li class="divider" data-text="{{ $role === 'admin' ? 'Products' : 'My Access' }}"></li>
+        <li>
+            <a href="{{ route('admin.products.index') }}">
+                <i class="bx bx-package icon"></i>
+                Products
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.user_feedbacks.index') }}">
+                <i class="bx bx-message-rounded icon"></i>
+                User Feedbacks
             </a>
         </li>
         <li>

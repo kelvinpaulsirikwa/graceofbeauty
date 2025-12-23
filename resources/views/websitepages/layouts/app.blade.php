@@ -19,7 +19,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Custom Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <style>
+        :root {
+            --gold-color: #D4AF37;
+            --gold-color-hover: #B8941F;
+            --gold-color-light: #E5C866;
+            --gold-color-dark: #A0821A;
+        }
+        
         * {
             margin: 0;
             padding: 0;

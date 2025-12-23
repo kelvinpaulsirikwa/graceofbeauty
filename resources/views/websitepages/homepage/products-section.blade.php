@@ -11,13 +11,13 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 md:mb-0">
                     <span class="relative inline-block">
                         OUR
-                        <span class="absolute bottom-0 left-0 w-full h-1 bg-red-600"></span>
+                        <span class="absolute bottom-0 left-0 w-full h-1" style="background-color: var(--gold-color, #D4AF37);"></span>
                     </span>
                     <span class="ml-2">PRODUCTS</span>
                 </h2>
                 
                 <!-- Filter Button -->
-                <button id="filter-toggle-btn" class="filter-toggle-btn bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition flex items-center gap-2 w-fit">
+                <button id="filter-toggle-btn" class="filter-toggle-btn px-6 py-2 rounded-lg transition flex items-center gap-2 w-fit" style="background-color: #000; color: var(--gold-color, #D4AF37);" onmouseover="this.style.backgroundColor='#1a1a1a'" onmouseout="this.style.backgroundColor='#000'">
                     <span>× Filter</span>
                     <svg id="filter-arrow" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -77,53 +77,7 @@
         <!-- Products Grid -->
         <div id="products-grid" class="products-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @forelse($products ?? [] as $product)
-                <a href="{{ route('product.show', $product->product_id) }}" class="product-card group relative bg-white rounded-lg overflow-hidden transition-transform duration-300 hover:shadow-lg block">
-                    <!-- Product Image Container -->
-                    <div class="relative overflow-hidden bg-gray-200" style="padding-top: 100%;">
-                        @php
-                            $productImage = $product->productImages->first() ?? null;
-                            $imageUrl = $productImage 
-                                ? Storage::url($productImage->image_path) 
-                                : ($product->front_image ? Storage::url($product->front_image) : asset('images/static_image/placeholder.jpg'));
-                        @endphp
-                        
-                        <img src="{{ $imageUrl }}" 
-                             alt="{{ $product->name }}" 
-                             class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                        
-                        <!-- Badge Overlay -->
-                        @if($product->available)
-                            <div class="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 text-xs font-semibold rounded">
-                                NEW
-                            </div>
-                        @else
-                            <div class="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-semibold rounded">
-                                OUT OF STOCK
-                            </div>
-                        @endif
-                    </div>
-                    
-                    <!-- Product Info -->
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[3rem]">
-                            {{ $product->name }}
-                        </h3>
-                        
-                        <!-- Rating Stars -->
-                        <div class="flex items-center mb-2">
-                            @for($i = 0; $i < 5; $i++)
-                                <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                </svg>
-                            @endfor
-                        </div>
-                        
-                        <!-- Price -->
-                        <p class="text-xl font-bold text-gray-800">
-                            TSH {{ number_format($product->price ?? 0, 2) }}
-                        </p>
-                    </div>
-                </a>
+                @include('websitepages.products.partials.product-card', ['product' => $product])
             @empty
                 <div class="col-span-full text-center py-12">
                     <p class="text-gray-600 text-lg">No products available at the moment.</p>

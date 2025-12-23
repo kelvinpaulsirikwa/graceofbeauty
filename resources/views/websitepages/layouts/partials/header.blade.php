@@ -12,12 +12,30 @@
 
             <!-- Navigation -->
             <nav class="hidden md:flex space-x-6 items-center">
-                <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition">Home</a>
-                <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition">Our Services</a>
-                <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition">Gallery</a>
-                <a href="#" class="text-gray-700 hover:text-yellow-500 transition">Blog</a>
-                <a href="{{ route('about') }}" class="text-gray-700 hover:text-yellow-500 transition">About Us</a>
-                <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition">Contact Us</a>
+                <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition relative pb-1 {{ request()->routeIs('home') || request()->is('/') ? 'text-yellow-500 font-semibold' : '' }}">
+                    Home
+                    @if(request()->routeIs('home') || request()->is('/'))
+                        <span class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500"></span>
+                    @endif
+                </a>
+                <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition relative pb-1 {{ request()->routeIs('services') || request()->routeIs('services.show') || request()->routeIs('user.feedback.story') || request()->is('services*') ? 'text-yellow-500 font-semibold' : '' }}">
+                    Our Services
+                    @if(request()->routeIs('services') || request()->routeIs('services.show') || request()->routeIs('user.feedback.story') || request()->is('services*'))
+                        <span class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500"></span>
+                    @endif
+                </a>
+                <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition relative pb-1 {{ request()->routeIs('gallery') || request()->is('gallery*') ? 'text-yellow-500 font-semibold' : '' }}">
+                    Gallery
+                    @if(request()->routeIs('gallery') || request()->is('gallery*'))
+                        <span class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500"></span>
+                    @endif
+                </a>
+                <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition relative pb-1 {{ request()->routeIs('contact') || request()->routeIs('contact.submit') || request()->is('contact*') ? 'text-yellow-500 font-semibold' : '' }}">
+                    Contact Us
+                    @if(request()->routeIs('contact') || request()->routeIs('contact.submit') || request()->is('contact*'))
+                        <span class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-500"></span>
+                    @endif
+                </a>
             </nav>
 
             <!-- Cart & Book Now -->
@@ -67,12 +85,10 @@
             <!-- Drawer Navigation -->
             <nav class="flex-1 overflow-y-auto p-4">
                 <div class="flex flex-col space-y-4">
-                    <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Home</a>
-                    <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Our Services</a>
-                    <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Gallery</a>
-                    <a href="#" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Blog</a>
-                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">About Us</a>
-                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100">Contact Us</a>
+                    <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('home') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Home</a>
+                    <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('services') || request()->routeIs('services.show') || request()->routeIs('user.feedback.story') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Our Services</a>
+                    <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('gallery') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Gallery</a>
+                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('contact') || request()->routeIs('contact.submit') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Contact Us</a>
                 </div>
             </nav>
             

@@ -4,12 +4,19 @@
 @php
     use Illuminate\Support\Facades\Storage;
 @endphp
+@php
+    use Illuminate\Support\Facades\Auth;
+    $user = Auth::user();
+    $isAdmin = $user && $user->role === 'admin';
+@endphp
 <div class="container-fluid px-4 py-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Products</h2>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-            <i class="bx bx-plus"></i> Add New Product
-        </a>
+        @if($isAdmin)
+            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                <i class="bx bx-plus"></i> Add New Product
+            </a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -98,16 +105,18 @@
                                         <a href="{{ route('admin.products.show', $product->product_id) }}" class="btn btn-sm btn-info" title="View">
                                             <i class="bx bx-show"></i>
                                         </a>
-                                        <a href="{{ route('admin.products.edit', $product->product_id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                            <i class="bx bx-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.products.destroy', $product->product_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                                <i class="bx bx-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if($isAdmin)
+                                            <a href="{{ route('admin.products.edit', $product->product_id) }}" class="btn btn-sm btn-warning" title="Edit">
+                                                <i class="bx bx-edit"></i>
+                                            </a>
+                                            <form action="{{ route('admin.products.destroy', $product->product_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

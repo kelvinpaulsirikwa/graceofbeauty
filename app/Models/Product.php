@@ -91,4 +91,14 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class, 'product_id', 'product_id');
     }
+
+    /**
+     * Check if the product is new (created within the last week).
+     *
+     * @return bool
+     */
+    public function isNew(): bool
+    {
+        return $this->created_at && $this->created_at->isAfter(now()->subWeek());
+    }
 }
