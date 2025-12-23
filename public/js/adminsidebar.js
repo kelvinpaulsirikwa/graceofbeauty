@@ -32,6 +32,12 @@ allDropdown.forEach(item=> {
 const toggleSidebar = document.querySelector('nav .toggle-sidebar');
 const allSideDivider = document.querySelectorAll('#sidebar .divider');
 
+// Check if mobile device
+function isMobile() {
+	return window.innerWidth <= 768;
+}
+
+// Initialize sidebar state
 if(sidebar.classList.contains('hide')) {
 	allSideDivider.forEach(item=> {
 		item.textContent = '-'
@@ -47,23 +53,71 @@ if(sidebar.classList.contains('hide')) {
 	})
 }
 
+// Mobile: Toggle sidebar show/hide
+// Desktop: Toggle sidebar hide/expand
 toggleSidebar.addEventListener('click', function () {
-	sidebar.classList.toggle('hide');
-
-	if(sidebar.classList.contains('hide')) {
-		allSideDivider.forEach(item=> {
-			item.textContent = '-'
-		})
-
-		allDropdown.forEach(item=> {
-			const a = item.parentElement.querySelector('a:first-child');
-			a.classList.remove('active');
-			item.classList.remove('show');
-		})
+	if(isMobile()) {
+		// On mobile, toggle show class
+		sidebar.classList.toggle('show');
+		// Prevent body scroll when sidebar is open
+		if(sidebar.classList.contains('show')) {
+			document.body.classList.add('sidebar-open');
+		} else {
+			document.body.classList.remove('sidebar-open');
+		}
 	} else {
-		allSideDivider.forEach(item=> {
-			item.textContent = item.dataset.text;
-		})
+		// On desktop, toggle hide class
+		sidebar.classList.toggle('hide');
+
+		if(sidebar.classList.contains('hide')) {
+			allSideDivider.forEach(item=> {
+				item.textContent = '-'
+			})
+
+			allDropdown.forEach(item=> {
+				const a = item.parentElement.querySelector('a:first-child');
+				a.classList.remove('active');
+				item.classList.remove('show');
+			})
+		} else {
+			allSideDivider.forEach(item=> {
+				item.textContent = item.dataset.text;
+			})
+		}
+	}
+})
+
+// Close sidebar when clicking overlay or outside on mobile
+document.addEventListener('click', function(e) {
+	const sidebarOverlay = document.querySelector('.sidebar-overlay');
+	
+	if(isMobile() && sidebar.classList.contains('show')) {
+		// If clicking on overlay
+		if(sidebarOverlay && sidebarOverlay.contains(e.target)) {
+			sidebar.classList.remove('show');
+			document.body.classList.remove('sidebar-open');
+			return;
+		}
+		
+		// If clicking outside sidebar and not on toggle button
+		if(!sidebar.contains(e.target) && !toggleSidebar.contains(e.target)) {
+			sidebar.classList.remove('show');
+			document.body.classList.remove('sidebar-open');
+		}
+	}
+})
+
+// Handle window resize
+window.addEventListener('resize', function() {
+	if(!isMobile()) {
+		// On desktop, remove show class if it exists
+		sidebar.classList.remove('show');
+		document.body.classList.remove('sidebar-open');
+	} else {
+		// On mobile, ensure sidebar is hidden by default if not showing
+		if(!sidebar.classList.contains('show')) {
+			sidebar.classList.add('hide');
+		}
 	}
 })
 

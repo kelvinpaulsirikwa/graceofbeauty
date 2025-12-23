@@ -34,7 +34,7 @@
                 </dd>
 
                 <dt class="col-sm-3">Description:</dt>
-                <dd class="col-sm-9">{{ $service->description ?? 'N/A' }}</dd>
+                <dd class="col-sm-9">{!! $service->description ?? 'N/A' !!}</dd>
 
                 <dt class="col-sm-3">Created By:</dt>
                 <dd class="col-sm-9">{{ $service->creator->name ?? 'N/A' }} ({{ $service->creator->email ?? 'N/A' }})</dd>
@@ -77,10 +77,10 @@
                             <div class="card">
                                 <img src="{{ Storage::url($image->image_path) }}" class="card-img-top" alt="Service Image" style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
-                                    <p class="card-text small">
+                                    <div class="card-text small">
                                         <strong>Description:</strong><br>
-                                        {{ $image->description ?? 'No description' }}
-                                    </p>
+                                        {!! $image->description ?? 'No description' !!}
+                                    </div>
                                     <p class="card-text small text-muted">
                                         <strong>Posted by:</strong> {{ $image->creator->name ?? 'N/A' }}<br>
                                         <strong>Created:</strong> {{ $image->created_at->format('Y-m-d H:i') }}

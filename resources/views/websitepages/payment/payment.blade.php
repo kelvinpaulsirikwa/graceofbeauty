@@ -116,7 +116,7 @@
                             </svg>
                         </div>
                         <h3 class="feature-title">Free Shipping</h3>
-                        <p class="feature-description">For all oder over $99</p>
+                        <p class="feature-description">For all oder over Tsh 1M</p>
                     </div>
                 </div>
             </div>
@@ -135,9 +135,9 @@
     </div>
 </section>
 
-<!-- Swiper JS CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!-- Swiper JS (Local) -->
+<link rel="stylesheet" href="{{ asset('css/swiper/swiper-bundle.min.css') }}" />
+<script src="{{ asset('js/swiper/swiper-bundle.min.js') }}"></script>
 
 <style>
     .payment-methods-section {
@@ -264,16 +264,16 @@
     .nav-chevron {
         width: 28px;
         height: 28px;
-        color: #dc2626;
+        color: var(--gold-color, #D4AF37);
         transition: all 0.3s ease;
     }
 
     .payment-swiper-button-next:hover,
     .payment-swiper-button-prev:hover {
-        background: #dc2626;
-        box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
+        background: var(--gold-color, #D4AF37);
+        box-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
         transform: translateY(-50%) scale(1.08);
-        border-color: rgba(220, 38, 38, 0.2);
+        border-color: rgba(212, 175, 55, 0.2);
     }
 
     .payment-swiper-button-next:hover .nav-chevron,

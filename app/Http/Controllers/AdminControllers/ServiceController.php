@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,7 +42,7 @@ class ServiceController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('front_image')) {
-            $imagePath = $request->file('front_image')->store('services', 'public');
+            $imagePath = ImageHelper::processServiceFrontImage($request->file('front_image'));
         }
 
         Service::create([
@@ -94,7 +95,7 @@ class ServiceController extends Controller
             if ($service->front_image && Storage::disk('public')->exists($service->front_image)) {
                 Storage::disk('public')->delete($service->front_image);
             }
-            $imagePath = $request->file('front_image')->store('services', 'public');
+            $imagePath = ImageHelper::processServiceFrontImage($request->file('front_image'));
         }
 
         $service->update([

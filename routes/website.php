@@ -19,6 +19,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/api/subcategories/{categoryId}', [HomeController::class, 'getSubcategories'])->name('api.subcategories');
 Route::post('/api/products/filter', [HomeController::class, 'filterProducts'])->name('api.products.filter');
 Route::get('/product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
+Route::get('/product/{id}/random', [WebsiteProductController::class, 'randomFromCategory'])->name('product.random');
 Route::get('/category/{id}', [WebsiteCategoryController::class, 'show'])->name('category.show');
 Route::post('/api/category/{categoryId}/products/filter', [WebsiteCategoryController::class, 'filterProducts'])->name('api.category.products.filter');
 Route::get('/services', [WebsiteServiceController::class, 'index'])->name('services');

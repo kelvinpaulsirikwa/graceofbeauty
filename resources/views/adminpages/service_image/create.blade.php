@@ -46,14 +46,13 @@
                         class="form-control @error('description') is-invalid @enderror" 
                         id="description" 
                         name="description" 
-                        rows="4"
+                        rows="10"
                         placeholder="Enter image description (optional)"
-                        maxlength="1000"
                     >{{ old('description') }}</textarea>
                     @error('description')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                    <div class="form-text">Add a description for this image (Max: 1000 characters)</div>
+                    <div class="form-text">Add a description for this image</div>
                 </div>
 
                 <div class="d-flex gap-2">
@@ -80,6 +79,14 @@
         } else {
             document.getElementById('imagePreview').style.display = 'none';
         }
+    });
+</script>
+
+<!-- CKEditor -->
+<script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
+<script>
+    CKEDITOR.replace('description', {
+        height: 400
     });
 </script>
 @endsection

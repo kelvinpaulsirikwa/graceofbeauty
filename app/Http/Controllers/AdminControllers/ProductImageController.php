@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class ProductImageController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $imagePath = $request->file('image_path')->store('product_images', 'public');
+        $imagePath = ImageHelper::processProductImage($request->file('image_path'));
 
         ProductImage::create([
             'product_id' => $productId,
@@ -92,7 +93,7 @@ class ProductImageController extends Controller
             if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
                 Storage::disk('public')->delete($image->image_path);
             }
-            $imagePath = $request->file('image_path')->store('product_images', 'public');
+            $imagePath = ImageHelper::processProductImage($request->file('image_path'));
         }
 
         $image->update([

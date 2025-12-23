@@ -38,7 +38,7 @@
                         class="form-control @error('description') is-invalid @enderror" 
                         id="description" 
                         name="description" 
-                        rows="5"
+                        rows="10"
                         placeholder="Enter feedback description..."
                     >{{ old('description') }}</textarea>
                     @error('description')
@@ -121,6 +121,14 @@
                     } else {
                         document.getElementById('imagePreview').style.display = 'none';
                     }
+                });
+            </script>
+
+            <!-- CKEditor -->
+            <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
+            <script>
+                CKEDITOR.replace('description', {
+                    height: 400
                 });
             </script>
         </div>

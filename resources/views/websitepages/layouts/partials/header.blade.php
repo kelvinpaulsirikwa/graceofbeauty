@@ -39,7 +39,21 @@
             </nav>
 
             <!-- Cart & Book Now -->
-            <div class="flex items-center space-x-3">
+            <div class="hidden md:flex items-center space-x-3">
+                @if(request()->routeIs('product.show'))
+                    @php
+                        $productId = request()->route('id');
+                        $product = \App\Models\Product::find($productId);
+                    @endphp
+                    @if($product)
+                        <a href="{{ route('product.random', $productId) }}" class="px-4 py-2 text-sm rounded-lg transition flex items-center gap-2 whitespace-nowrap" style="background-color: #000; color: var(--gold-color, #D4AF37);" onmouseover="this.style.backgroundColor='#1a1a1a'" onmouseout="this.style.backgroundColor='#000'">
+                            <span>See another product</span>
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--gold-color, #D4AF37);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    @endif
+                @endif
                 <!-- <button class="text-gray-700 hover:text-yellow-500 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -85,6 +99,20 @@
             <!-- Drawer Navigation -->
             <nav class="flex-1 overflow-y-auto p-4">
                 <div class="flex flex-col space-y-4">
+                    @if(request()->routeIs('product.show'))
+                        @php
+                            $productId = request()->route('id');
+                            $product = \App\Models\Product::find($productId);
+                        @endphp
+                        @if($product)
+                            <a href="{{ route('product.random', $productId) }}" class="w-full px-4 py-3 text-base rounded-lg transition flex items-center justify-between mb-4 font-medium" style="background-color: #000; color: var(--gold-color, #D4AF37);" onmouseover="this.style.backgroundColor='#1a1a1a'" onmouseout="this.style.backgroundColor='#000'">
+                                <span>See another product</span>
+                                <svg class="w-5 h-5 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--gold-color, #D4AF37);">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        @endif
+                    @endif
                     <a href="{{ url('/') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('home') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Home</a>
                     <a href="{{ route('services') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('services') || request()->routeIs('services.show') || request()->routeIs('user.feedback.story') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Our Services</a>
                     <a href="{{ route('gallery') }}" class="text-gray-700 hover:text-yellow-500 transition py-3 text-lg border-b border-gray-100 {{ request()->routeIs('gallery') ? 'text-yellow-500 font-semibold border-yellow-500' : '' }}">Gallery</a>

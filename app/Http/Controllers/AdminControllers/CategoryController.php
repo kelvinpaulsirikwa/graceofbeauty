@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class CategoryController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('front_image')) {
-            $imagePath = $request->file('front_image')->store('categories', 'public');
+            $imagePath = ImageHelper::processCategoryImage($request->file('front_image'));
         }
 
         Category::create([
@@ -88,7 +89,7 @@ class CategoryController extends Controller
             if ($category->front_image && Storage::disk('public')->exists($category->front_image)) {
                 Storage::disk('public')->delete($category->front_image);
             }
-            $imagePath = $request->file('front_image')->store('categories', 'public');
+            $imagePath = ImageHelper::processCategoryImage($request->file('front_image'));
         }
 
         $category->update([

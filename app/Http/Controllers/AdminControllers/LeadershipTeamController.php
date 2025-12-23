@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\LeadershipTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +46,7 @@ class LeadershipTeamController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('leadership_teams', 'public');
+            $imagePath = ImageHelper::processLeadershipTeamImage($request->file('image'));
         }
 
         LeadershipTeam::create([
@@ -106,7 +107,7 @@ class LeadershipTeamController extends Controller
             if ($leadershipTeam->image && Storage::disk('public')->exists($leadershipTeam->image)) {
                 Storage::disk('public')->delete($leadershipTeam->image);
             }
-            $imagePath = $request->file('image')->store('leadership_teams', 'public');
+            $imagePath = ImageHelper::processLeadershipTeamImage($request->file('image'));
         }
 
         $leadershipTeam->update([

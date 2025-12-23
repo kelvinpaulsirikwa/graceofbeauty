@@ -26,7 +26,16 @@
                     </svg>
                 @endfor
             </div>
-            <p class="text-xl font-bold text-gray-800">$ {{ number_format($product->price ?? 0, 1) }}</p>
+            <div class="flex items-center gap-2">
+                @if($product->offer && $product->offer_price)
+                    <span class="text-xl font-bold text-red-600">TSH {{ number_format($product->offer_price, 0) }}</span>
+                    @if($product->price)
+                        <span class="text-sm text-gray-500 line-through">TSH {{ number_format($product->price, 1) }}</span>
+                    @endif
+                @else
+                    <p class="text-xl font-bold text-gray-800">TSH {{ number_format($product->price ?? 0, 1) }}</p>
+                @endif
+            </div>
         </div>
     </div>
 @endforeach

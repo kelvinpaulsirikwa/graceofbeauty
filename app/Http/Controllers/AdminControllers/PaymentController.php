@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +41,7 @@ class PaymentController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('payments', 'public');
+            $imagePath = ImageHelper::processPaymentImage($request->file('image'));
         }
 
         Payment::create([
@@ -91,7 +92,7 @@ class PaymentController extends Controller
             if ($payment->image && Storage::disk('public')->exists($payment->image)) {
                 Storage::disk('public')->delete($payment->image);
             }
-            $imagePath = $request->file('image')->store('payments', 'public');
+            $imagePath = ImageHelper::processPaymentImage($request->file('image'));
         }
 
         $payment->update([

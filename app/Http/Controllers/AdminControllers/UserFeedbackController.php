@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\UserFeedback;
@@ -47,7 +48,7 @@ class UserFeedbackController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('user_feedbacks', 'public');
+            $imagePath = ImageHelper::processUserFeedbackImage($request->file('image'));
         }
 
         UserFeedback::create([
@@ -128,7 +129,7 @@ class UserFeedbackController extends Controller
             if ($feedback->image && Storage::disk('public')->exists($feedback->image)) {
                 Storage::disk('public')->delete($feedback->image);
             }
-            $imagePath = $request->file('image')->store('user_feedbacks', 'public');
+            $imagePath = ImageHelper::processUserFeedbackImage($request->file('image'));
         }
 
         $feedback->update([

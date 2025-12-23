@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
@@ -74,7 +75,7 @@ class ProductController extends Controller
         try {
             $imagePath = null;
             if ($request->hasFile('front_image')) {
-                $imagePath = $request->file('front_image')->store('products', 'public');
+                $imagePath = ImageHelper::processProductFrontImage($request->file('front_image'));
             }
 
             $product = Product::create([
@@ -84,6 +85,8 @@ class ProductController extends Controller
                 'subcategory_id' => $validated['subcategory_id'] ?? null,
                 'front_image' => $imagePath,
                 'price' => $validated['price'] ?? null,
+                'offer' => $request->has('offer') ? true : false,
+                'offer_price' => $validated['offer_price'] ?? null,
                 'available' => $request->has('available') ? true : false,
                 'created_by' => Auth::id(),
             ]);
@@ -168,6 +171,8 @@ class ProductController extends Controller
             'subcategory_id' => ['nullable', 'exists:subcategories,subcategory_id'],
             'front_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'price' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'offer' => ['nullable', 'boolean'],
+            'offer_price' => ['nullable', 'integer', 'min:0'],
             'available' => ['nullable', 'boolean'],
             'product_attributes' => ['nullable', 'array'],
             'product_attributes.*.attribute_id' => ['required', 'exists:product_attributes,id'],
@@ -182,7 +187,7 @@ class ProductController extends Controller
                 if ($product->front_image && Storage::disk('public')->exists($product->front_image)) {
                     Storage::disk('public')->delete($product->front_image);
                 }
-                $imagePath = $request->file('front_image')->store('products', 'public');
+                $imagePath = ImageHelper::processProductFrontImage($request->file('front_image'));
             }
 
             $product->update([
@@ -192,6 +197,8 @@ class ProductController extends Controller
                 'subcategory_id' => $validated['subcategory_id'] ?? null,
                 'front_image' => $imagePath,
                 'price' => $validated['price'] ?? null,
+                'offer' => $request->has('offer') ? true : false,
+                'offer_price' => $validated['offer_price'] ?? null,
                 'available' => $request->has('available') ? true : false,
             ]);
 

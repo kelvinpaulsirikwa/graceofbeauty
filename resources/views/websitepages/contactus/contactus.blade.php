@@ -139,7 +139,7 @@
   <section>
   <div class="w-full" style="height: 600px;">
         <iframe 
-            src="https://www.google.com/maps?q=VV4X+88C+Ihumwa+Dodoma+Tanzania&output=embed&zoom=15" 
+            src="https://www.google.com/maps?q={{ config('site.contact.latitude') }},{{ config('site.contact.longitude') }}&output=embed&zoom=15" 
             width="100%" 
             height="100%" 
             style="border:0;" 

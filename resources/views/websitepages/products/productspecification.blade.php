@@ -85,7 +85,16 @@
 
                     <!-- Price -->
                     <div class="mb-6">
-                        <p class="text-3xl font-bold text-gray-800">TSH {{ number_format($product->price ?? 0, 2) }}</p>
+                        @if($product->offer && $product->offer_price)
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl font-bold text-red-600">TSH {{ number_format($product->offer_price, 0) }}</span>
+                                @if($product->price)
+                                    <span class="text-xl text-gray-500 line-through">TSH {{ number_format($product->price, 2) }}</span>
+                                @endif
+                            </div>
+                        @else
+                            <p class="text-3xl font-bold text-gray-800">TSH {{ number_format($product->price ?? 0, 2) }}</p>
+                        @endif
                     </div>
 
                     <!-- Product Information Card -->

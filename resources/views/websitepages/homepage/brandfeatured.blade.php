@@ -73,7 +73,16 @@
                                         </svg>
                                     @endfor
                                 </div>
-                                <p class="item-price">TSH {{ number_format($product->price ?? 0, 1) }}</p>
+                                <div class="item-price">
+                                    @if($product->offer && $product->offer_price)
+                                        <span class="text-red-600 font-bold">TSH {{ number_format($product->offer_price, 0) }}</span>
+                                        @if($product->price)
+                                            <span class="text-xs text-gray-500 line-through ml-1">TSH {{ number_format($product->price, 1) }}</span>
+                                        @endif
+                                    @else
+                                        <span>TSH {{ number_format($product->price ?? 0, 1) }}</span>
+                                    @endif
+                                </div>
                             </div>
                         </a>
                     @empty
@@ -111,7 +120,16 @@
                                         </svg>
                                     @endfor
                                 </div>
-                                <p class="item-price">TSH {{ number_format($product->price ?? 0, 1) }}</p>
+                                <div class="item-price">
+                                    @if($product->offer && $product->offer_price)
+                                        <span class="text-red-600 font-bold">TSH {{ number_format($product->offer_price, 0) }}</span>
+                                        @if($product->price)
+                                            <span class="text-xs text-gray-500 line-through ml-1">TSH {{ number_format($product->price, 1) }}</span>
+                                        @endif
+                                    @else
+                                        <span>TSH {{ number_format($product->price ?? 0, 1) }}</span>
+                                    @endif
+                                </div>
                             </div>
                         </a>
                     @empty

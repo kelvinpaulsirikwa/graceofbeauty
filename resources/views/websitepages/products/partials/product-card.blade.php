@@ -22,12 +22,11 @@
              class="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
         
         <!-- Badge Overlay -->
-        @if($product->isNew())
-            <div class="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 text-xs font-semibold rounded">
-                NEW
-            </div>
-        @elseif(!$product->available)
-            <div class="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-semibold rounded">
+        <div class="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 text-xs font-semibold rounded">
+            NEW
+        </div>
+        @if(!$product->available)
+            <div class="absolute top-3 right-3 bg-black text-white px-2 py-1 text-xs font-semibold rounded">
                 OUT OF STOCK
             </div>
         @endif
@@ -49,9 +48,22 @@
         </div>
         
         <!-- Price -->
-        <p class="text-xl font-bold text-gray-800">
-            {{ $pricePrefix }} {{ number_format($product->price ?? 0, $priceDecimals ?? 2) }}
-        </p>
+        <div class="flex items-center gap-2">
+            @if($product->offer && $product->offer_price)
+                <span class="text-xl font-bold text-red-600">
+                    {{ $pricePrefix }} {{ number_format($product->offer_price, 0) }}
+                </span>
+                @if($product->price)
+                    <span class="text-sm text-gray-500 line-through">
+                        {{ $pricePrefix }} {{ number_format($product->price, $priceDecimals ?? 2) }}
+                    </span>
+                @endif
+            @else
+                <p class="text-xl font-bold text-gray-800">
+                    {{ $pricePrefix }} {{ number_format($product->price ?? 0, $priceDecimals ?? 2) }}
+                </p>
+            @endif
+        </div>
     </div>
 </a>
 

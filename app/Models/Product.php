@@ -20,12 +20,15 @@ class Product extends Model
         'subcategory_id',
         'front_image',
         'price',
+        'offer',
+        'offer_price',
         'available',
         'created_by',
     ];
 
     protected $casts = [
         'available' => 'boolean',
+        'offer' => 'boolean',
     ];
 
     /**

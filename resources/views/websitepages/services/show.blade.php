@@ -27,7 +27,7 @@
             </span>
         </h1>
         @if($service->description)
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">{{ $service->description }}</p>
+            <div class="text-lg text-gray-600 max-w-3xl mx-auto">{!! $service->description !!}</div>
         @endif
     </div>
 
@@ -58,14 +58,14 @@
                                 </div>
                                 
                                 <h3 class="text-2xl font-bold text-gray-800 mb-4">
-                                    {{ $image->description ? Str::limit($image->description, 50) : 'Service Image' }}
+                                    {!! $image->description ? Str::limit(strip_tags($image->description), 50) : 'Service Image' !!}
                                 </h3>
                                 
                                 <div class="flex-1 overflow-y-auto mb-6 description-scroll">
                                     @if($image->description)
-                                        <p class="text-gray-700 text-lg leading-relaxed">
-                                            {{ $image->description }}
-                                        </p>
+                                        <div class="text-gray-700 text-lg leading-relaxed">
+                                            {!! $image->description !!}
+                                        </div>
                                     @else
                                         <p class="text-gray-500 italic">No description available for this image.</p>
                                     @endif

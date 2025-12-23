@@ -624,14 +624,244 @@ main .btn-send:hover {
 
 
 
+/* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
+	/* Sidebar - Hidden by default on mobile, show on toggle */
+	#sidebar {
+		position: fixed;
+		max-width: 260px;
+		width: 100%;
+		left: -260px;
+		z-index: 1000;
+		box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+		transition: left 0.3s ease;
+	}
+	
+	#sidebar.show {
+		left: 0;
+	}
+	
+	#sidebar.hide {
+		max-width: 260px;
+		left: -260px;
+	}
+	
+	#sidebar.hide:hover {
+		max-width: 260px;
+		left: -260px;
+	}
+	
+	/* Overlay when sidebar is open on mobile */
+	body.sidebar-open {
+		overflow: hidden;
+	}
+	
+	.sidebar-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 999;
+		display: none;
+	}
+	
+	body.sidebar-open .sidebar-overlay {
+		display: block;
+	}
+	
+	/* Content - Full width on mobile */
 	#content {
 		position: relative;
-		width: calc(100% - 60px);
+		width: 100%;
+		left: 0;
 		transition: all .3s ease;
+		padding-left: 0;
+		padding-right: 0;
 	}
-	nav .nav-link,
+	
+	#sidebar.hide + #content {
+		width: 100%;
+		left: 0;
+	}
+	
+	/* Navbar - Better mobile layout */
+	nav {
+		padding: 0 15px;
+		height: 56px;
+		flex-wrap: wrap;
+	}
+	
+	nav .toggle-sidebar {
+		font-size: 24px;
+		margin-right: 10px;
+	}
+	
+	nav form {
+		max-width: 100%;
+		flex: 1;
+		min-width: 0;
+	}
+	
+	nav .form-group {
+		font-size: 12px;
+	}
+	
+	nav .form-group strong {
+		font-size: 13px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	
+	nav .nav-link {
+		display: none;
+	}
+	
 	nav .divider {
 		display: none;
+	}
+	
+	/* Main content padding */
+	.main-content {
+		padding: 10px 15px !important;
+	}
+	
+	/* Container fluid adjustments */
+	.container-fluid {
+		padding-left: 15px !important;
+		padding-right: 15px !important;
+	}
+	
+	/* Cards and tables */
+	.card {
+		margin-bottom: 15px;
+	}
+	
+	.card-body {
+		padding: 15px !important;
+	}
+	
+	.table-responsive {
+		font-size: 13px;
+	}
+	
+	/* Buttons */
+	.btn {
+		font-size: 13px;
+		padding: 8px 12px;
+	}
+	
+	.btn-sm {
+		font-size: 12px;
+		padding: 6px 10px;
+	}
+	
+	/* Forms */
+	.form-control {
+		font-size: 14px;
+		padding: 10px 12px;
+	}
+	
+	.form-label {
+		font-size: 14px;
+		margin-bottom: 8px;
+	}
+	
+	/* User info in sidebar */
+	#sidebar .form-group {
+		padding: 15px 10px;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	
+	#sidebar .form-group .user-avatar-fallback,
+	#sidebar .form-group .user-avatar-img {
+		margin-bottom: 10px;
+		margin-right: 0;
+	}
+	
+	/* Side menu items */
+	#sidebar .side-menu {
+		margin: 20px 0;
+		padding: 0 15px;
+	}
+	
+	#sidebar .side-menu a {
+		font-size: 13px;
+		padding: 10px 12px;
+	}
+	
+	#sidebar .side-menu .icon {
+		min-width: 40px;
+		font-size: 18px;
+	}
+	
+	/* Sidebar ads section */
+	#sidebar .ads {
+		padding: 15px;
+	}
+	
+	#sidebar .ads .wrapper {
+		padding: 15px;
+	}
+	
+	#sidebar .btn-upgrade {
+		font-size: 13px;
+		padding: 10px 0;
+	}
+}
+
+/* Extra small devices */
+@media screen and (max-width: 480px) {
+	nav {
+		height: 50px;
+		padding: 0 10px;
+	}
+	
+	nav .toggle-sidebar {
+		font-size: 22px;
+	}
+	
+	nav .form-group strong {
+		font-size: 11px;
+	}
+	
+	.main-content {
+		padding: 8px 10px !important;
+	}
+	
+	.container-fluid {
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+	}
+	
+	.card-body {
+		padding: 12px !important;
+	}
+	
+	.table-responsive {
+		font-size: 12px;
+	}
+	
+	.btn {
+		font-size: 12px;
+		padding: 6px 10px;
+	}
+	
+	.form-control {
+		font-size: 13px;
+		padding: 8px 10px;
+	}
+	
+	#sidebar .side-menu a {
+		font-size: 12px;
+		padding: 8px 10px;
+	}
+	
+	#sidebar .side-menu .icon {
+		min-width: 36px;
+		font-size: 16px;
 	}
 }

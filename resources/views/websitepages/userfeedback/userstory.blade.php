@@ -60,7 +60,16 @@
                                              class="w-14 h-14 object-cover rounded mr-3">
                                         <div class="flex-1 min-w-0">
                                             <h4 class="font-semibold text-gray-800 text-sm truncate">{{ $product->name }}</h4>
-                                            <p class="text-xs text-gray-600">TSH {{ number_format($product->price ?? 0, 2) }}</p>
+                                            <div class="text-xs">
+                                                @if($product->offer && $product->offer_price)
+                                                    <span class="text-red-600 font-bold">TSH {{ number_format($product->offer_price, 0) }}</span>
+                                                    @if($product->price)
+                                                        <span class="text-gray-500 line-through ml-1">TSH {{ number_format($product->price, 2) }}</span>
+                                                    @endif
+                                                @else
+                                                    <span class="text-gray-600">TSH {{ number_format($product->price ?? 0, 2) }}</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </a>
                                 @endforeach
@@ -96,7 +105,7 @@
                                         <div class="flex-1 min-w-0">
                                             <h4 class="font-semibold text-gray-800 text-sm truncate">{{ $service->service_name }}</h4>
                                             @if($service->description)
-                                                <p class="text-xs text-gray-600 line-clamp-2">{{ Str::limit($service->description, 50) }}</p>
+                                                <div class="text-xs text-gray-600 line-clamp-2">{!! Str::limit($service->description, 50) !!}</div>
                                             @endif
                                         </div>
                                     </a>
@@ -112,9 +121,9 @@
                         <div class="bg-white rounded-lg shadow-md p-8">
                             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">The Story</h2>
                             <div class="prose max-w-none">
-                                <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-                                    {{ $feedback->description }}
-                                </p>
+                                <div class="text-gray-700 text-lg leading-relaxed">
+                                    {!! $feedback->description !!}
+                                </div>
                             </div>
                         </div>
                     @endif

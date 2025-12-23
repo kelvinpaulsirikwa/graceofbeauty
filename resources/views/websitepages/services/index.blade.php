@@ -149,14 +149,12 @@
 
                         @if($service->description)
                             @php
-                                // Limit description to approximately 3-4 paragraphs (around 800-1000 characters)
+                                // Limit description to approximately 3-4 paragraphs (around 900 characters)
                                 $maxLength = 900;
-                                $description = $service->description;
-                                $truncated = Str::limit($description, $maxLength, '...');
                             @endphp
-                            <p class="description-text">
-                                {{ $truncated }}
-                            </p>
+                            <div class="description-text">
+                                {!! Str::limit($service->description, $maxLength, '...') !!}
+                            </div>
                         @else
                             <p class="description-text">
                                 Discover our premium {{ $service->service_name }} service designed to enhance your beauty and style.

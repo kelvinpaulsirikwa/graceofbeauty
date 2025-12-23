@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Service;
 use App\Models\ServiceImage;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class ServiceImageController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $imagePath = $request->file('image_path')->store('service_images', 'public');
+        $imagePath = ImageHelper::processServiceImage($request->file('image_path'));
 
         ServiceImage::create([
             'service_id' => $serviceId,
@@ -94,7 +95,7 @@ class ServiceImageController extends Controller
             if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
                 Storage::disk('public')->delete($image->image_path);
             }
-            $imagePath = $request->file('image_path')->store('service_images', 'public');
+            $imagePath = ImageHelper::processServiceImage($request->file('image_path'));
         }
 
         $image->update([

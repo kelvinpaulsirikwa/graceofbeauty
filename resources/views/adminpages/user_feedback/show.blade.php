@@ -28,7 +28,7 @@
                 </dd>
 
                 <dt class="col-sm-3">Description:</dt>
-                <dd class="col-sm-9">{{ $feedback->description ?? 'N/A' }}</dd>
+                <dd class="col-sm-9">{!! $feedback->description ?? 'N/A' !!}</dd>
 
                 <dt class="col-sm-3">Products Used:</dt>
                 <dd class="col-sm-9">

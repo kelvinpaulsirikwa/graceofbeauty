@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class UserController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('users', 'public');
+            $imagePath = ImageHelper::processUserImage($request->file('image'));
         }
 
         User::create([
@@ -97,7 +98,7 @@ class UserController extends Controller
             if ($user->image && Storage::disk('public')->exists($user->image)) {
                 Storage::disk('public')->delete($user->image);
             }
-            $imagePath = $request->file('image')->store('users', 'public');
+            $imagePath = ImageHelper::processUserImage($request->file('image'));
         }
 
         $user->update([

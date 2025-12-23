@@ -3,7 +3,7 @@
 @section('title', 'Home')
 
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="{{ asset('css/fonts/playfair/playfair.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminControllers;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class BrandController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('brands', 'public');
+            $imagePath = ImageHelper::processBrandImage($request->file('image'));
         }
 
         Brand::create([
@@ -88,7 +89,7 @@ class BrandController extends Controller
             if ($brand->image && Storage::disk('public')->exists($brand->image)) {
                 Storage::disk('public')->delete($brand->image);
             }
-            $imagePath = $request->file('image')->store('brands', 'public');
+            $imagePath = ImageHelper::processBrandImage($request->file('image'));
         }
 
         $brand->update([

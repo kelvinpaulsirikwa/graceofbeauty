@@ -48,7 +48,7 @@
                                         <span class="text-muted">No Image</span>
                                     @endif
                                 </td>
-                                <td>{{ Str::limit($feedback->description ?? 'N/A', 50) }}</td>
+                                <td>{!! Str::limit($feedback->description ?? 'N/A', 50) !!}</td>
                                 <td>
                                     @if($feedback->product_used && count($feedback->product_used) > 0)
                                         <span class="badge bg-info">{{ count($feedback->product_used) }} product(s)</span>

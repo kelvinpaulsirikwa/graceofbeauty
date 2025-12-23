@@ -16,7 +16,8 @@ return [
         'phone_short' => env('SITE_PHONE_SHORT', '(+255) 659 920 815'),
         'email' => env('SITE_EMAIL', 'janethmalikita@gmail.com'),
         'address' => env('SITE_ADDRESS', 'Ihumwa Kwa Juli, P.O. Box 283 Dodoma, Tanzania'),
-        'location_code' => env('SITE_LOCATION_CODE', 'VV4X+88C, Ihumwa'),
+        'latitude' => env('SITE_LATITUDE', '-6.144365'),
+        'longitude' => env('SITE_LONGITUDE', '35.898974'),
     ],
 
     'opening_hours' => [

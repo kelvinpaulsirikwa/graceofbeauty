@@ -47,7 +47,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $service->service_name }}</td>
-                                <td>{{ Str::limit($service->description ?? 'N/A', 50) }}</td>
+                                <td>{!! Str::limit($service->description ?? 'N/A', 50) !!}</td>
                                 <td>{{ $service->creator->name ?? 'N/A' }}</td>
                                 <td>{{ $service->created_at->format('Y-m-d H:i:s') }}</td>
                                 <td>{{ $service->updated_at->format('Y-m-d H:i:s') }}</td>

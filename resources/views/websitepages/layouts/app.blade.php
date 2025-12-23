@@ -8,15 +8,14 @@
 
     <title>{{ config('site.name') }} - @yield('title', config('site.tagline'))</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Fonts (Local) -->
+    <link href="{{ asset('css/fonts/figtree/figtree.css') }}" rel="stylesheet" />
 
     <!-- Bootstrap CSS (Local) -->
     <link href="{{ asset('css/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (Local) -->
+    <script src="{{ asset('js/tailwind/tailwind.min.js') }}"></script>
     
     <!-- Custom Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">

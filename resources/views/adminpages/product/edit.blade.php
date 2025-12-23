@@ -174,6 +174,51 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input @error('offer') is-invalid @enderror" 
+                                    type="checkbox" 
+                                    id="offer" 
+                                    name="offer" 
+                                    value="1"
+                                    {{ old('offer', $product->offer) ? 'checked' : '' }}
+                                    onchange="toggleOfferPrice()"
+                                >
+                                <label class="form-check-label" for="offer">
+                                    Offer
+                                </label>
+                                @error('offer')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="form-text">Check if this product has an offer</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="offer_price" class="form-label">Offer Price</label>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                class="form-control @error('offer_price') is-invalid @enderror" 
+                                id="offer_price" 
+                                name="offer_price" 
+                                value="{{ old('offer_price', $product->offer_price) }}" 
+                                placeholder="0"
+                                {{ old('offer', $product->offer) ? '' : 'disabled' }}
+                            >
+                            @error('offer_price')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">Enter offer price (integer only)</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="form-label mb-0">Product Attributes</label>
@@ -338,6 +383,15 @@
     @else
         addAttributeRow();
     @endif
+
+    function toggleOfferPrice() {
+        const offerCheckbox = document.getElementById('offer');
+        const offerPriceInput = document.getElementById('offer_price');
+        offerPriceInput.disabled = !offerCheckbox.checked;
+        if (!offerCheckbox.checked) {
+            offerPriceInput.value = '';
+        }
+    }
 </script>
 @endsection
 
