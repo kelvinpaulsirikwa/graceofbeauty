@@ -3,7 +3,7 @@
 return [
 
     'name' => env('SITE_NAME', 'GraceOfBeauty'),
-    'motto' => env('SITE_MOTTO', 'A form of Elegances'),
+    'motto' => env('SITE_MOTTO', 'A form of Elegance'),
     'tagline' => env('SITE_TAGLINE', 'Hair Salon & Spa'),
     'company_acronym' => env('COMPANY_ACRONYM', 'GoB.'),
     'owner' => [
@@ -15,7 +15,7 @@ return [
         'phone' => env('SITE_PHONE', '(+255) 659 920 815'),
         'phone_short' => env('SITE_PHONE_SHORT', '(+255) 659 920 815'),
         'email' => env('SITE_EMAIL', 'janethmalikita@gmail.com'),
-        'address' => env('SITE_ADDRESS', 'Ihumwa Kwa Juli, P.O. Box 283 Dodoma, Tanzania'),
+        'address' => env('SITE_ADDRESS', 'Dodoma, Tanzania'),
         'latitude' => env('SITE_LATITUDE', '-6.144365'),
         'longitude' => env('SITE_LONGITUDE', '35.898974'),
     ],
