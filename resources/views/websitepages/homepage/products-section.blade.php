@@ -3,7 +3,7 @@
 @endphp
 
 <!-- Our Products Section -->
-<section class="our-products-section py-16 bg-gray-50">
+<section id="products" class="our-products-section py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <!-- Section Header -->
         <div class="mb-8">

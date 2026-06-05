@@ -1,369 +1,463 @@
 @php
     use Illuminate\Support\Facades\Storage;
+
+    $heroImage = asset('images/static_image/frontimage.jpg');
+    $placeholder = asset('images/static_image/placeholder.jpg');
+    $showcaseIcons = ['👑', '🌿', '✨'];
+    $showcaseDefaults = [
+        ['icon' => '👑', 'title' => 'Premium Wigs', 'desc' => 'Lace front & full cap styles', 'url' => null, 'image' => null],
+        ['icon' => '🌿', 'title' => 'Human Hair', 'desc' => '100% Remy & Virgin hair', 'url' => null, 'image' => null],
+        ['icon' => '✨', 'title' => 'Accessories', 'desc' => 'Oils, bands & essentials', 'url' => null, 'image' => null],
+    ];
+
+    $showcaseItems = $categories->count() > 0
+        ? $categories->take(3)->values()->map(function ($category, $index) use ($showcaseIcons, $placeholder) {
+            return [
+                'icon' => $showcaseIcons[$index % count($showcaseIcons)],
+                'title' => $category->category_name,
+                'desc' => ($category->subcategories->count() ?? 0) . ' items',
+                'url' => route('category.show', $category->category_id),
+                'image' => $category->front_image ? Storage::url($category->front_image) : $placeholder,
+            ];
+        })->all()
+        : $showcaseDefaults;
+
+    $marqueeItems = $categories->count() > 0
+        ? $categories->pluck('category_name')->merge(['Premium Wigs', 'Human Hair Extensions', 'Hair Oils & Serums', config('site.name')])->unique()->values()
+        : collect(['Premium Wigs', 'Human Hair Extensions', 'Hair Oils & Serums', 'Hair Bands & Accessories', 'Lace Front Wigs', config('site.name')]);
 @endphp
 
-<!-- Hero Section with Welcome Area and Categories -->
-<div class="hero-section-container">
-    <!-- Welcome Area Start -->
-    <section class="welcome-area">
-        <div class="welcome-bg" style="background-image: url('{{ asset('images/static_image/frontimage.jpg') }}');">
-            <div class="welcome-overlay"></div>
+<section id="hero" class="gob-hero">
+    {{-- Left: hero image with elegant text overlay --}}
+    <div class="hero-left">
+        <div class="hero-left-bg" style="background-image: url('{{ $heroImage }}');"></div>
+        <div class="hero-left-overlay"></div>
+        <div class="hero-left-content">
+            <p class="hero-eyebrow">✦ Premium Hair Boutique</p>
+            <h1 class="hero-title">
+                Beauty <em>Crafted</em><br>for You
+            </h1>
+            <p class="hero-sub">
+                Discover our curated collection of premium wigs, 100% human hair extensions, and luxury hair accessories — crafted to empower your confidence.
+            </p>
+            <div class="hero-cta">
+                <a href="#products" class="btn-primary">Shop Collection</a>
+                <a href="{{ route('made-for-you') }}" class="btn-outline">Our Story</a>
+            </div>
         </div>
-        <div class="welcome-text">
-        <h2>Beauty Enhanced<br>With Quality</h2>
-        <p>
-        "Explore premium wigs, human hair, beauty oils, accessories, and more.  
-        Define your unique style with products crafted to bring out your confidence 
-        and help you express your true beauty."
-    </p>
-    <a href="{{ route('made-for-you') }}" class="btn-akame-btn">Made for You</a>
-</div>
+    </div>
 
-    </section>
-    <!-- Welcome Area End -->
-
-    <!-- Categories Grid Section -->
-    <section class="categories-section">
-        <div class="categories-grid-container">
-            @if($categories->count() > 0)
-                @foreach($categories->take(4) as $index => $category)
-                    <a href="{{ route('category.show', $category->category_id) }}" class="category-card" style="display: block; text-decoration: none; color: inherit;">
-                        <div class="category-bg" style="background-image: url('{{ $category->front_image ? Storage::url($category->front_image) : asset('images/static_image/placeholder.jpg') }}');">
-                            <div class="category-overlay"></div>
+    {{-- Right: circular shape + floating cards --}}
+    <div class="hero-right">
+        <div class="hero-visual">
+            <div class="hero-circle-bg"></div>
+            <div class="showcase-label">Beauty</div>
+            <div class="hero-product-showcase">
+                @foreach($showcaseItems as $card)
+                    @if(!empty($card['url']))
+                        <a href="{{ $card['url'] }}" class="floating-card">
+                    @else
+                        <div class="floating-card">
+                    @endif
+                        @if(!empty($card['image']))
+                            <div class="card-thumb">
+                                <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}">
+                            </div>
+                        @else
+                            <span class="card-icon">{{ $card['icon'] }}</span>
+                        @endif
+                        <div class="card-info">
+                            <div class="card-title">{{ $card['title'] }}</div>
+                            <div class="card-desc">{{ $card['desc'] }}</div>
                         </div>
-                        <div class="category-content">
-                            <h4 class="category-title">{{ $category->category_name }}</h4>
-                            <p class="category-count">{{ $category->subcategories->count() ?? 0 }} items</p>
-                            <span class="btn-shop-now">VIEW</span>
+                    @if(!empty($card['url']))
+                        </a>
+                    @else
                         </div>
-                    </a>
+                    @endif
                 @endforeach
-            @else
-                <div class="no-categories">
-                    <p>No categories available at the moment.</p>
-                </div>
-            @endif
+            </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<div class="marquee-wrapper">
+    <div class="marquee-track">
+        @foreach($marqueeItems->merge($marqueeItems) as $item)
+            <span class="marquee-item">{{ $item }} <span class="marquee-dot">✦</span></span>
+        @endforeach
+    </div>
 </div>
 
 <style>
-    /* Main Hero Section Container */
-    .hero-section-container {
+    .gob-hero {
+        --gold: #C9A96E;
+        --gold-light: #E8D5B0;
+        --cream: #FAF6F0;
+        --deep: #1A1209;
+        --warm: #3D2B1F;
+
+        min-height: calc(100vh - 120px);
         display: grid;
         grid-template-columns: 1fr 1fr;
-        min-height: 100vh;
-        width: 100%;
-        align-items: stretch;
-        gap: 0 5px;
-        padding-top: 10px;
+        position: relative;
+        overflow: hidden;
+        background: var(--cream);
+        font-family: 'Jost', sans-serif;
+        font-weight: 300;
     }
 
-    /* Welcome Area (Left Side - Constant) */
-    .welcome-area {
+    /* ── Left: hero image + text ── */
+    .gob-hero .hero-left {
         position: relative;
-        width: 100%;
-        height: 100%;
-        min-height: 100vh;
-        background-color: #f5f0e8;
+        overflow: hidden;
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        padding: 60px 50px;
-        box-sizing: border-box;
-        overflow: hidden;
+        min-height: calc(100vh - 120px);
     }
 
-    .welcome-bg {
+    .gob-hero .hero-left-bg {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-    }
-
-    .welcome-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%);
-    }
-
-    .welcome-text {
-        position: relative;
-        z-index: 2;
-        max-width: 600px;
-        color: #fff;
-        text-align: left;
-        background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
-        padding: 30px;
-        border-radius: 0;
-    }
-
-    .welcome-text h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 4rem;
-        line-height: 1.1;
-        margin-bottom: 20px;
-        font-weight: 700;
-        color: #fff;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .welcome-text p {
-        font-size: 1.05rem;
-        line-height: 1.6;
-        margin-bottom: 30px;
-        color: rgba(255,255,255,0.9);
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    .btn-akame-btn {
-        display: inline-block;
-        border: 2px solid #fff;
-        padding: 12px 36px;
-        border-radius: 30px;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #fff;
-        background: transparent;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    .btn-akame-btn:hover {
-        background: #fff;
-        color: #000;
-        text-shadow: none;
-    }
-
-    /* Categories Grid Section (Right Side) */
-    .categories-section {
-        width: 100%;
-        height: 100%;
-        min-height: 100vh;
-        padding: 0;
-        display: flex;
-        align-items: stretch;
-        justify-content: stretch;
-        background-color: transparent;
-        box-sizing: border-box;
-    }
-
-    .categories-grid-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 5px;
-        width: 100%;
-        height: 100%;
-    }
-
-    .category-card {
-        position: relative;
-        overflow: hidden;
-        border-radius: 0;
-        box-shadow: none;
-        transition: transform 0.3s ease;
-        min-height: 50vh;
-    }
-
-    /* Background Colors for Category Cards */
-    .bg-mint-green {
-        background-color: #a8e6cf;
-    }
-
-    .bg-lavender {
-        background-color: #d4c5f9;
-    }
-
-    .bg-pink {
-        background-color: #ffd3e1;
-    }
-
-    .bg-light-blue {
-        background-color: #b3e5fc;
-    }
-
-    .category-card:hover {
         transform: scale(1.02);
+        transition: transform 8s ease;
     }
 
-    .category-bg {
+    .gob-hero .hero-left:hover .hero-left-bg {
+        transform: scale(1.06);
+    }
+
+    .gob-hero .hero-left-overlay {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        inset: 0;
+        background: linear-gradient(
+            to right,
+            rgba(26, 18, 9, 0.72) 0%,
+            rgba(26, 18, 9, 0.45) 55%,
+            rgba(26, 18, 9, 0.2) 100%
+        );
+        z-index: 1;
     }
 
-    .category-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%);
-    }
-
-    .category-content {
+    .gob-hero .hero-left-content {
         position: relative;
         z-index: 2;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 30px 25px;
-        color: #fff;
-        background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
-        border-radius: 0;
+        padding: 4rem;
+        max-width: 560px;
     }
 
-    .category-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 5px;
-        color: #fff;
-        line-height: 1.2;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .category-count {
-        font-size: 0.95rem;
-        color: rgba(255,255,255,0.9);
-        margin-bottom: 20px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* Shop Now Button for Grid Cards */
-    .btn-shop-now {
-        display: inline-block;
-        padding: 0;
-        background-color: transparent;
-        border: none;
-        color: #fff;
-        text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 700;
+    .gob-hero .hero-eyebrow {
+        font-size: 0.65rem;
+        letter-spacing: 0.4em;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        width: fit-content;
-        position: relative;
-        padding-bottom: 5px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        color: var(--gold-light);
+        margin-bottom: 1.5rem;
+        opacity: 0;
+        animation: gobFadeUp 0.8s 0.3s forwards;
     }
 
-    .btn-shop-now::after {
+    .gob-hero .hero-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(2.8rem, 4.5vw, 5rem);
+        font-weight: 300;
+        line-height: 1.05;
+        color: #fff;
+        opacity: 0;
+        animation: gobFadeUp 0.8s 0.5s forwards;
+    }
+
+    .gob-hero .hero-title em {
+        font-style: italic;
+        color: var(--gold);
+    }
+
+    .gob-hero .hero-sub {
+        margin-top: 1.8rem;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.88);
+        max-width: 420px;
+        opacity: 0;
+        animation: gobFadeUp 0.8s 0.7s forwards;
+    }
+
+    .gob-hero .hero-cta {
+        margin-top: 2.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        animation: gobFadeUp 0.8s 0.9s forwards;
+    }
+
+    .gob-hero .btn-primary {
+        background: var(--gold);
+        color: white;
+        border: none;
+        padding: 0.95rem 2.5rem;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: background 0.3s, transform 0.2s;
+        display: inline-block;
+    }
+
+    .gob-hero .btn-primary:hover {
+        background: var(--warm);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .gob-hero .btn-outline {
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        color: #fff;
+        padding: 0.95rem 2.5rem;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
+        display: inline-block;
+    }
+
+    .gob-hero .btn-outline:hover {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* ── Right: circle shape + floating cards ── */
+    .gob-hero .hero-right {
+        position: relative;
+        overflow: hidden;
+        min-height: calc(100vh - 120px);
+        background: var(--cream);
+    }
+
+    .gob-hero .hero-right::before {
         content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: var(--gold-color, #D4AF37);
-        transform: scaleX(1);
-        transition: transform 0.3s ease;
-        box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+        inset: 0;
+        background: linear-gradient(135deg, #C9A96E22 0%, #D4A0A022 50%, #1A120911 100%);
+        z-index: 1;
     }
 
-    .btn-shop-now:hover {
-        color: var(--gold-color-dark, #A0821A);
+    .gob-hero .hero-visual {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        min-height: inherit;
     }
 
-    .no-categories {
-        grid-column: 1 / -1;
+    .gob-hero .hero-circle-bg {
+        width: min(520px, 75vw);
+        height: min(520px, 75vw);
+        border-radius: 50%;
+        background: linear-gradient(135deg, #E8D5B0 0%, #C9A96E 50%, #3D2B1F 100%);
+        position: absolute;
+        opacity: 0.22;
+        animation: gobRotateSlow 20s linear infinite;
+        z-index: 1;
+    }
+
+    .gob-hero .hero-product-showcase {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 4rem 3rem 3rem;
+        height: 100%;
+        width: 100%;
+    }
+
+    .gob-hero .showcase-label {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-style: italic;
+        color: var(--gold);
+        opacity: 0.15;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: 0.06em;
+        z-index: 1;
+    }
+
+    .gob-hero .floating-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(201, 169, 110, 0.35);
+        padding: 1rem 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: min(280px, 85%);
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 8px 32px rgba(61, 43, 31, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        opacity: 0;
+        animation: gobFadeUp 0.8s forwards, gobFloat 5s ease-in-out infinite;
+    }
+
+    .gob-hero .floating-card:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 16px 48px rgba(61, 43, 31, 0.14);
+    }
+
+    .gob-hero .floating-card:nth-child(1) {
+        animation-delay: 1s, 0s;
+        align-self: flex-start;
+        margin-left: 8%;
+    }
+
+    .gob-hero .floating-card:nth-child(2) {
+        animation-delay: 1.2s, 1.5s;
+        align-self: center;
+    }
+
+    .gob-hero .floating-card:nth-child(3) {
+        animation-delay: 1.4s, 0.7s;
+        align-self: flex-end;
+        margin-right: 8%;
+    }
+
+    .gob-hero .card-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+        width: 52px;
         text-align: center;
-        padding: 60px 20px;
-        color: #666;
-        font-size: 1.1rem;
     }
 
-    /* Responsive Design */
+    .gob-hero .card-thumb {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 2px solid rgba(201, 169, 110, 0.4);
+    }
+
+    .gob-hero .card-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gob-hero .card-title {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        color: var(--deep);
+        text-transform: uppercase;
+    }
+
+    .gob-hero .card-desc {
+        font-size: 0.7rem;
+        color: var(--warm);
+        margin-top: 0.2rem;
+    }
+
+    @keyframes gobFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes gobRotateSlow {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ── Marquee ── */
+    .marquee-wrapper {
+        overflow: hidden;
+        background: #1A1209;
+        padding: 1rem 0;
+        border-top: 1px solid rgba(201, 169, 110, 0.2);
+        border-bottom: 1px solid rgba(201, 169, 110, 0.2);
+    }
+
+    .marquee-track {
+        display: flex;
+        gap: 3rem;
+        animation: gobMarquee 18s linear infinite;
+        white-space: nowrap;
+    }
+
+    .marquee-item {
+        font-family: 'Cormorant Garamond', serif;
+        font-style: italic;
+        font-size: 1rem;
+        color: #E8D5B0;
+        letter-spacing: 0.1em;
+        flex-shrink: 0;
+    }
+
+    .marquee-dot {
+        color: #C9A96E;
+        margin: 0 0.5rem;
+    }
+
+    @keyframes gobFadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gobMarquee {
+        to { transform: translateX(-50%); }
+    }
+
     @media (max-width: 1024px) {
-        .hero-section-container {
+        .gob-hero {
             grid-template-columns: 1fr;
-        }
-
-        .welcome-area {
-            min-height: 60vh;
-            padding: 40px 30px;
-        }
-
-        .welcome-text h2 {
-            font-size: 3rem;
-        }
-
-        .categories-section {
             min-height: auto;
         }
 
-        .category-card {
-            min-height: 40vh;
+        .gob-hero .hero-left,
+        .gob-hero .hero-right {
+            min-height: 55vh;
+        }
+
+        .gob-hero .hero-left-content {
+            padding: 3rem 2rem;
         }
     }
 
-    @media (max-width: 768px) {
-        .welcome-text h2 {
-            font-size: 2.5rem;
+    @media (max-width: 900px) {
+        .gob-hero .hero-right {
+            min-height: 50vh;
         }
 
-        .welcome-text p {
-            font-size: 0.95rem;
-        }
-
-        .welcome-area {
-            padding: 30px 25px;
-        }
-
-        .categories-grid-container {
-            grid-template-columns: 1fr;
-            grid-template-rows: repeat(4, 1fr);
-        }
-
-        .category-card {
-            min-height: 35vh;
-        }
-
-        .category-title {
-            font-size: 1.75rem;
-        }
-
-        .category-content {
-            padding: 25px 20px;
+        .gob-hero .floating-card {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            align-self: center !important;
         }
     }
 
-    @media (max-width: 480px) {
-        .welcome-text h2 {
-            font-size: 2rem;
+    @media (max-width: 600px) {
+        .gob-hero .hero-cta {
+            flex-direction: column;
         }
 
-        .welcome-text p {
-            font-size: 0.9rem;
-        }
-
-        .welcome-area {
-            padding: 25px 20px;
-        }
-
-        .category-content {
-            padding: 20px 15px;
-        }
-
-        .category-title {
-            font-size: 1.5rem;
+        .gob-hero .btn-primary,
+        .gob-hero .btn-outline {
+            text-align: center;
         }
     }
 </style>

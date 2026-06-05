@@ -21,8 +21,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $categories = Category::whereNotNull('front_image')
-            ->with('subcategories')
+        $categories = Category::with('subcategories')
             ->latest()
             ->take(4)
             ->get();

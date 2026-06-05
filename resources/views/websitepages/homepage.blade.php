@@ -3,7 +3,7 @@
 @section('title', 'Home')
 
 @push('styles')
-<link href="{{ asset('css/fonts/playfair/playfair.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 @endpush
 
 @section('content')
