@@ -1,0 +1,1882 @@
+FINAL PROJECT STRUCTURE
+moi_api/
+│
+├── manage.py
+│
+├── moi_api/
+│   ├── settings.py
+│   ├── urls.py
+│
+├── accounts/
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│
+├── courses/
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+
+Why only 2 apps?
+
+accounts  -> users, login, registration
+courses   -> course + enrolment
+
+Easy to explain.
+
+STEP 1: CREATE PROJECT
+Command
+django-admin startproject moi_api
+
+cd moi_api
+
+python manage.py startapp accounts
+
+python manage.py startapp courses
+STEP 2: INSTALL PACKAGES
+Command
+pip install djangorestframework
+
+pip install djangorestframework-simplejwt
+
+pip install mysqlclient
+STEP 3: CONFIGURE SETTINGS
+File
+moi_api/settings.py
+Add apps
+INSTALLED_APPS = [
+
+    'rest_framework',
+
+    'accounts',
+    'courses',
+]
+Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moi_db',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+JWT
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    ),
+}
+Custom User
+AUTH_USER_MODEL = 'accounts.User'
+Why?
+
+Tell interviewer:
+
+Since the system has Admin, Tutor and Learner, I need a custom user model.
+
+STEP 4: CREATE USER MODEL
+File
+accounts/models.py
+Code
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class User(AbstractUser):
+
+    ROLE_CHOICES = (
+        ('admin', 'Admin'),
+        ('tutor', 'Tutor'),
+        ('learner', 'Learner'),
+    )
+
+    GENDER_CHOICES = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+    )
+
+    fullname = models.CharField(max_length=100)
+
+    gender = models.CharField(
+        max_length=10,
+        choices=GENDER_CHOICES
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='learner'
+    )
+Why?
+
+Question requires:
+
+Learner
+id
+fullname
+password
+gender
+role
+created_at
+
+Django already gives:
+
+id
+password
+date_joined
+
+You only add:
+
+fullname
+gender
+role
+
+This saves time.
+
+STEP 5: CREATE COURSE MODEL
+File
+courses/models.py
+Code
+from django.db import models
+from accounts.models import User
+
+
+class Course(models.Model):
+
+    PROGRAM_CHOICES = (
+
+        ('certificate', 'Certificate'),
+        ('diploma', 'Diploma'),
+    )
+
+    STATUS_CHOICES = (
+
+        ('active', 'Active'),
+        ('withdraw', 'Withdraw'),
+    )
+
+    title = models.CharField(max_length=100)
+
+    course_code = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
+    tutor = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    capacity = models.IntegerField()
+
+    program = models.CharField(
+        max_length=20,
+        choices=PROGRAM_CHOICES
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+Why?
+
+This directly satisfies:
+
+Course
+title
+program
+course_code
+tutor
+capacity
+status
+STEP 6: CREATE ENROLMENT MODEL
+File
+courses/models.py
+
+Below Course model.
+
+class Enrolment(models.Model):
+
+    learner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    is_deleted = models.BooleanField(
+        default=False
+    )
+
+    class Meta:
+
+        unique_together = (
+            'learner',
+            'course'
+        )
+Why add is_deleted?
+
+Interview question:
+
+justify hard delete or soft delete
+
+Use soft delete.
+
+is_deleted=True
+
+instead of deleting.
+
+Answer:
+
+Academic systems require audit history.
+
+STEP 7: RUN MIGRATIONS
+Command
+python manage.py makemigrations
+
+python manage.py migrate
+
+At this point database tables exist.
+
+STEP 8: USER REGISTRATION SERIALIZER
+File
+accounts/serializers.py
+from rest_framework import serializers
+from .models import User
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = User
+
+        fields = (
+            'id',
+            'fullname',
+            'username',
+            'password',
+            'gender',
+            'role'
+        )
+
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def validate_role(self, value):
+
+        if value in ['admin', 'tutor']:
+
+            raise serializers.ValidationError(
+                "Cannot assign admin/tutor role"
+            )
+
+        return value
+
+    def create(self, validated_data):
+
+        return User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            fullname=validated_data['fullname'],
+            gender=validated_data['gender'],
+            role='learner'
+        )
+Why?
+
+Question says:
+
+Learner should not assign himself Admin or Tutor role
+
+This validation solves it.
+
+STEP 9: REGISTRATION API
+File
+accounts/views.py
+from rest_framework import generics
+from .serializers import RegisterSerializer
+
+
+class RegisterView(
+    generics.CreateAPIView
+):
+
+    serializer_class = RegisterSerializer
+Why?
+
+Creates user.
+
+Simple.
+
+Only 4 lines.
+
+STEP 10: JWT LOGIN
+
+No custom login view needed.
+
+Use SimpleJWT.
+
+File
+accounts/urls.py
+from django.urls import path
+
+from .views import RegisterView
+
+from rest_framework_simplejwt.views import (
+
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+
+    path(
+        'register/',
+        RegisterView.as_view()
+    ),
+
+    path(
+        'login/',
+        TokenObtainPairView.as_view()
+    ),
+
+    path(
+        'refresh/',
+        TokenRefreshView.as_view()
+    ),
+]
+Why?
+
+Saves 30 minutes.
+
+Interviewer likes this answer:
+
+I reused Django REST Framework JWT endpoints instead of writing authentication logic from scratch.
+
+STEP 11: COURSE SERIALIZER
+File
+courses/serializers.py
+from rest_framework import serializers
+from .models import Course
+
+
+class CourseSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = Course
+
+        fields = '__all__'
+STEP 12: COURSE CRUD
+File
+courses/views.py
+from rest_framework.viewsets import ModelViewSet
+from .models import Course
+from .serializers import CourseSerializer
+
+
+class CourseViewSet(ModelViewSet):
+
+    queryset = Course.objects.all()
+
+    serializer_class = CourseSerializer
+STEP 13: ADMIN ONLY COURSE CREATION
+
+Inside CourseViewSet
+
+def perform_create(
+    self,
+    serializer
+):
+
+    if self.request.user.role != 'admin':
+
+        raise PermissionDenied(
+            "Only admin allowed"
+        )
+
+    serializer.save()
+Why?
+
+Question says:
+
+Courses added by Admin only
+STEP 14: ENROLMENT SERIALIZER
+File
+courses/serializers.py
+
+Add below CourseSerializer.
+
+from .models import Enrolment
+class EnrolmentSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = Enrolment
+
+        fields = '__all__'
+
+    def validate(self, data):
+
+        course = data['course']
+
+        count = Enrolment.objects.filter(
+            course=course,
+            is_deleted=False
+        ).count()
+
+        if count >= course.capacity:
+
+            raise serializers.ValidationError(
+                "Course full"
+            )
+
+        return data
+Why?
+
+Question says:
+
+Capacity reached -> no enrolment
+
+This is where you enforce it.
+
+STEP 15: ENROLMENT CRUD
+File
+courses/views.py
+class EnrolmentViewSet(
+    ModelViewSet
+):
+
+    serializer_class = EnrolmentSerializer
+Role-based listing
+def get_queryset(self):
+
+    user = self.request.user
+
+    if user.role == 'admin':
+
+        return Enrolment.objects.filter(
+            is_deleted=False
+        )
+
+    elif user.role == 'tutor':
+
+        return Enrolment.objects.filter(
+            course__tutor=user,
+            is_deleted=False
+        )
+
+    return Enrolment.objects.filter(
+        learner=user,
+        is_deleted=False
+    )
+Why?
+
+Question says:
+
+Everyone sees enrolments according to role
+
+Admin:
+
+all enrolments
+
+Tutor:
+
+enrolments in his courses
+
+Learner:
+
+his enrolments only
+STEP 16: SOFT DELETE
+
+Inside EnrolmentViewSet
+
+def perform_destroy(
+    self,
+    instance
+):
+
+    instance.is_deleted = True
+
+    instance.save()
+Interview explanation
+
+Instead of:
+
+instance.delete()
+
+We do:
+
+instance.is_deleted = True
+
+Because:
+
+Academic records must remain available for auditing.
+STEP 17: URLS
+File
+courses/urls.py
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+
+router.register(
+    'courses',
+    CourseViewSet
+)
+
+router.register(
+    'enrolments',
+    EnrolmentViewSet
+)
+Root URLs
+File
+moi_api/urls.py
+from django.urls import path, include
+
+urlpatterns = [
+
+    path(
+        'api/auth/',
+        include('accounts.urls')
+    ),
+
+    path(
+        'api/',
+        include('courses.urls')
+    ),
+]
+What the Interviewer Wants to Hear
+
+After finishing, summarize:
+
+Business Rule 1
+
+✔ Learner cannot self-assign Admin/Tutor.
+
+Implemented in:
+
+RegisterSerializer
+Business Rule 2
+
+✔ JWT Authentication.
+
+Implemented using:
+
+SimpleJWT
+Business Rule 3
+
+✔ Course capacity check.
+
+Implemented in:
+
+EnrolmentSerializer.validate()
+Business Rule 4
+
+✔ Admin only creates courses.
+
+Implemented in:
+
+CourseViewSet.perform_create()
+Business Rule 5
+
+✔ Role-based enrolment visibility.
+
+Implemented in:
+
+EnrolmentViewSet.get_queryset()
+Business Rule 6
+
+✔ Soft delete.
+
+Implemented using:
+
+is_deleted
+
+If you can implement up to Step 15 comfortably and explain each decision, you'll demonstrate Django, DRF, JWT, MySQL, permissions, validation, and API design skills—the exact areas PSRS interviewers are usually testing.
+
+
+Frontend Structure
+
+Create outside Django project:
+
+npm create vite@latest frontend -- --template react
+
+cd frontend
+
+npm install
+
+npm install axios react-router-dom
+
+Structure:
+
+frontend/
+│
+├── src/
+│
+├── api/
+│   └── axios.js
+│
+├── pages/
+│   ├── LoginPage.jsx
+│   ├── CoursePage.jsx
+│   └── EnrolmentPage.jsx
+│
+├── components/
+│   ├── CourseCard.jsx
+│   └── Navbar.jsx
+│
+├── App.jsx
+└── main.jsx
+STEP 1: Enable CORS
+Django
+
+Install:
+
+pip install django-cors-headers
+settings.py
+INSTALLED_APPS = [
+
+    ...
+
+    "corsheaders",
+]
+MIDDLEWARE = [
+
+    "corsheaders.middleware.CorsMiddleware",
+
+    ...
+]
+CORS_ALLOWED_ORIGINS = [
+
+    "http://localhost:5173",
+]
+STEP 2: Create Axios Client
+src/api/axios.js
+import axios from "axios";
+
+const api = axios.create({
+
+    baseURL:
+    "http://127.0.0.1:8000/api/"
+});
+
+export default api;
+
+Why?
+
+Instead of writing:
+
+axios.get(
+ "http://127.0.0.1:8000/api/courses/"
+)
+
+everywhere.
+
+STEP 3: Login Page
+src/pages/LoginPage.jsx
+import { useState } from "react";
+import api from "../api/axios";
+
+function LoginPage() {
+
+    const [username,setUsername] =
+        useState("");
+
+    const [password,setPassword] =
+        useState("");
+
+    const login = async () => {
+
+        try{
+
+            const response =
+                await api.post(
+                    "auth/login/",
+                    {
+                        username,
+                        password
+                    }
+                );
+
+            localStorage.setItem(
+                "access",
+                response.data.access
+            );
+
+            alert("Login success");
+
+        }catch(error){
+
+            alert("Invalid login");
+        }
+    };
+
+    return (
+
+        <div>
+
+            <h2>Login</h2>
+
+            <input
+                placeholder="Username"
+                onChange={
+                    e =>
+                    setUsername(
+                        e.target.value
+                    )
+                }
+            />
+
+            <input
+                type="password"
+                placeholder="Password"
+                onChange={
+                    e =>
+                    setPassword(
+                        e.target.value
+                    )
+                }
+            />
+
+            <button onClick={login}>
+                Login
+            </button>
+
+        </div>
+    );
+}
+
+export default LoginPage;
+STEP 4: Fetch Courses
+
+Backend already provides:
+
+GET /api/courses/
+
+Create:
+
+src/pages/CoursePage.jsx
+import { useEffect } from "react";
+import { useState } from "react";
+
+import api from "../api/axios";
+
+function CoursePage(){
+
+    const [courses,setCourses] =
+        useState([]);
+
+    useEffect(()=>{
+
+        const loadCourses =
+            async ()=>{
+
+            const token =
+                localStorage.getItem(
+                    "access"
+                );
+
+            const response =
+                await api.get(
+                    "courses/",
+                    {
+                        headers:{
+                            Authorization:
+                            `Bearer ${token}`
+                        }
+                    }
+                );
+
+            setCourses(
+                response.data
+            );
+        };
+
+        loadCourses();
+
+    },[]);
+
+    return(
+
+        <div>
+
+            <h2>Courses</h2>
+
+            {
+                courses.map(course=>(
+
+                    <div
+                        key={course.id}
+                    >
+
+                        <h3>
+                            {course.title}
+                        </h3>
+
+                        <p>
+                            Capacity:
+                            {course.capacity}
+                        </p>
+
+                    </div>
+                ))
+            }
+
+        </div>
+    );
+}
+
+export default CoursePage;
+STEP 5: Create Reusable Course Card
+src/components/CourseCard.jsx
+function CourseCard({course}){
+
+    return(
+
+        <div>
+
+            <h3>
+                {course.title}
+            </h3>
+
+            <p>
+                {course.program}
+            </p>
+
+            <p>
+                {course.course_code}
+            </p>
+
+        </div>
+    );
+}
+
+export default CourseCard;
+STEP 6: Enrolment Page
+
+Backend endpoint:
+
+POST /api/enrolments/
+src/pages/EnrolmentPage.jsx
+import api from "../api/axios";
+
+function EnrolmentPage(){
+
+    const enrol =
+        async(courseId)=>{
+
+        const token =
+            localStorage.getItem(
+                "access"
+            );
+
+        try{
+
+            await api.post(
+
+                "enrolments/",
+
+                {
+                    course: courseId
+                },
+
+                {
+                    headers:{
+                        Authorization:
+                        `Bearer ${token}`
+                    }
+                }
+            );
+
+            alert(
+                "Enrolled Successfully"
+            );
+
+        }catch(error){
+
+            alert(
+                error.response.data
+            );
+        }
+    };
+
+    return(
+
+        <button
+            onClick={()=>
+                enrol(1)
+            }
+        >
+            Enrol
+        </button>
+    );
+}
+
+export default EnrolmentPage;
+STEP 7: Routing
+App.jsx
+import {
+ BrowserRouter,
+ Routes,
+ Route
+}
+from "react-router-dom";
+
+import LoginPage
+from "./pages/LoginPage";
+
+import CoursePage
+from "./pages/CoursePage";
+
+function App(){
+
+ return(
+
+  <BrowserRouter>
+
+   <Routes>
+
+    <Route
+      path="/"
+      element={<LoginPage />}
+    />
+
+    <Route
+      path="/courses"
+      element={<CoursePage />}
+    />
+
+   </Routes>
+
+  </BrowserRouter>
+ );
+}
+
+export default App;
+STEP 8: Simple Navbar
+components/Navbar.jsx
+function Navbar(){
+
+    const logout = ()=>{
+
+        localStorage.removeItem(
+            "access"
+        );
+
+        window.location="/";
+    };
+
+    return(
+
+        <nav>
+
+            <button
+                onClick={logout}
+            >
+                Logout
+            </button>
+
+        </nav>
+    );
+}
+
+export default Navbar;
+
+
+
+
+PROJECT STRUCTURE
+course-api/
+
+├── src/main/java/com/moi/courseapi
+
+│
+├── config/
+│   └── SecurityConfig.java
+│
+├── entity/
+│   ├── User.java
+│   ├── Course.java
+│   └── Enrolment.java
+│
+├── repository/
+│   ├── UserRepository.java
+│   ├── CourseRepository.java
+│   └── EnrolmentRepository.java
+│
+├── dto/
+│   ├── RegisterRequest.java
+│   ├── LoginRequest.java
+│   └── EnrolmentRequest.java
+│
+├── service/
+│   ├── UserService.java
+│   ├── CourseService.java
+│   └── EnrolmentService.java
+│
+├── controller/
+│   ├── AuthController.java
+│   ├── CourseController.java
+│   └── EnrolmentController.java
+│
+└── CourseApiApplication.java
+STEP 1: CREATE PROJECT
+
+Use:
+
+Spring Initializr
+
+Include:
+
+Spring Web
+
+Spring Data JPA
+
+Spring Security
+
+MySQL Driver
+
+Lombok
+
+Validation
+STEP 2: CONFIGURE DATABASE
+application.properties
+spring.datasource.url=jdbc:mysql://localhost:3306/moi_db
+
+spring.datasource.username=root
+
+spring.datasource.password=
+
+spring.jpa.hibernate.ddl-auto=update
+
+spring.jpa.show-sql=true
+STEP 3: CREATE USER ENTITY
+entity/User.java
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String fullname;
+
+    private String username;
+
+    private String password;
+
+    private String gender;
+
+    private String role;
+}
+Why?
+
+Question requires:
+
+Learner
+id
+fullname
+password
+gender
+role
+STEP 4: CREATE COURSE ENTITY
+entity/Course.java
+@Entity
+@Getter
+@Setter
+public class Course {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String courseCode;
+
+    private String program;
+
+    private Integer capacity;
+
+    private String status;
+
+    @ManyToOne
+    private User tutor;
+}
+STEP 5: CREATE ENROLMENT ENTITY
+entity/Enrolment.java
+@Entity
+@Getter
+@Setter
+public class Enrolment {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    private User learner;
+
+    @ManyToOne
+    private Course course;
+
+    private boolean deleted=false;
+}
+Why deleted?
+
+For soft delete.
+
+Interview answer:
+
+Academic systems should preserve history for auditing.
+
+STEP 6: REPOSITORIES
+repository/UserRepository.java
+@Repository
+public interface UserRepository
+extends JpaRepository<User,Long>{
+
+    Optional<User>
+    findByUsername(String username);
+}
+repository/CourseRepository.java
+@Repository
+public interface CourseRepository
+extends JpaRepository<Course,Long>{
+}
+repository/EnrolmentRepository.java
+@Repository
+public interface EnrolmentRepository
+extends JpaRepository<Enrolment,Long>{
+
+    long countByCourseAndDeletedFalse(
+        Course course
+    );
+
+}
+STEP 7: REGISTRATION DTO
+dto/RegisterRequest.java
+@Data
+public class RegisterRequest {
+
+    private String fullname;
+
+    private String username;
+
+    private String password;
+
+    private String gender;
+
+    private String role;
+}
+STEP 8: REGISTER USER
+service/UserService.java
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository repo;
+
+    public User register(
+            RegisterRequest request){
+
+        if(
+            "admin".equalsIgnoreCase(
+                request.getRole()
+            ) ||
+
+            "tutor".equalsIgnoreCase(
+                request.getRole()
+            )
+        ){
+
+            throw new RuntimeException(
+                "Role not allowed"
+            );
+        }
+
+        User user = new User();
+
+        user.setFullname(
+            request.getFullname()
+        );
+
+        user.setUsername(
+            request.getUsername()
+        );
+
+        user.setPassword(
+            request.getPassword()
+        );
+
+        user.setGender(
+            request.getGender()
+        );
+
+        user.setRole("learner");
+
+        return repo.save(user);
+    }
+}
+Business Rule Covered
+Learner cannot assign Admin/Tutor role
+STEP 9: AUTH CONTROLLER
+controller/AuthController.java
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final UserService service;
+
+    @PostMapping("/register")
+    public User register(
+            @RequestBody
+            RegisterRequest request){
+
+        return service.register(
+            request
+        );
+    }
+}
+STEP 10: COURSE CRUD
+controller/CourseController.java
+@RestController
+@RequestMapping("/api/courses")
+@RequiredArgsConstructor
+public class CourseController {
+
+    private final CourseRepository repo;
+
+    @GetMapping
+    public List<Course> all(){
+
+        return repo.findAll();
+    }
+
+    @PostMapping
+    public Course create(
+        @RequestBody Course course){
+
+        return repo.save(course);
+    }
+}
+STEP 11: ADMIN ONLY COURSE CREATION
+
+Simplified interview approach:
+
+@PostMapping
+public Course create(
+    @RequestBody Course course,
+    Authentication auth){
+
+    User user =
+        (User) auth.getPrincipal();
+
+    if(
+      !user.getRole()
+           .equals("admin")
+    ){
+
+        throw new RuntimeException(
+            "Only Admin allowed"
+        );
+    }
+
+    return repo.save(course);
+}
+Business Rule Covered
+Courses added by Admin only
+STEP 12: ENROLMENT SERVICE
+service/EnrolmentService.java
+@Service
+@RequiredArgsConstructor
+public class EnrolmentService {
+
+    private final EnrolmentRepository repo;
+
+    private final CourseRepository courseRepo;
+
+    public Enrolment create(
+            Long courseId,
+            User learner){
+
+        Course course =
+            courseRepo.findById(courseId)
+            .orElseThrow();
+
+        long count =
+            repo.countByCourseAndDeletedFalse(
+                course
+            );
+
+        if(
+            count >=
+            course.getCapacity()
+        ){
+
+            throw new RuntimeException(
+                "Course full"
+            );
+        }
+
+        Enrolment enrolment =
+            new Enrolment();
+
+        enrolment.setLearner(
+            learner
+        );
+
+        enrolment.setCourse(
+            course
+        );
+
+        return repo.save(
+            enrolment
+        );
+    }
+}
+Business Rule Covered
+Course capacity reached
+STEP 13: ROLE-BASED LISTING
+
+Inside service:
+
+if(user.getRole().equals("admin")){
+
+    return repo.findAll();
+}
+
+Tutor:
+
+return repo.findByCourseTutor(
+        user
+);
+
+Learner:
+
+return repo.findByLearner(
+        user
+);
+Business Rule Covered
+Each role sees only relevant enrolments
+STEP 14: SOFT DELETE
+
+Instead of:
+
+repo.delete(enrolment);
+
+Use:
+
+enrolment.setDeleted(true);
+
+repo.save(enrolment);
+
+
+
+
+React
+   |
+Axios
+   |
+DRF API
+   |
+JWT Authentication
+   |
+MySQL
+SIMPLIFIED PROJECT STRUCTURE
+Backend
+backend/
+
+├── accounts/
+├── jobs/
+├── recruitment_system/
+└── manage.py
+Frontend
+frontend/
+
+├── src/
+│
+├── components/
+│   ├── Login.jsx
+│   ├── JobList.jsx
+│   └── ApplyForm.jsx
+│
+├── pages/
+│   ├── LoginPage.jsx
+│   └── Dashboard.jsx
+│
+├── App.jsx
+└── main.jsx
+
+Only 3 React components.
+
+STEP 1: CREATE DJANGO BACKEND
+django-admin startproject recruitment_system
+
+cd recruitment_system
+
+python manage.py startapp accounts
+
+python manage.py startapp jobs
+
+Install:
+
+pip install djangorestframework
+
+pip install djangorestframework-simplejwt
+
+pip install mysqlclient
+
+pip install django-cors-headers
+STEP 2: CREATE REACT FRONTEND
+
+Outside backend:
+
+npm create vite@latest frontend -- --template react
+
+cd frontend
+
+npm install
+
+npm install axios
+
+npm run dev
+STEP 3: CONFIGURE CORS
+
+React:
+
+localhost:5173
+
+Django:
+
+localhost:8000
+
+Need CORS.
+
+settings.py
+INSTALLED_APPS = [
+
+    'corsheaders',
+
+    'rest_framework',
+
+    'accounts',
+    'jobs',
+]
+
+Middleware:
+
+MIDDLEWARE = [
+
+    'corsheaders.middleware.CorsMiddleware',
+
+]
+
+Allow React:
+
+CORS_ALLOWED_ORIGINS = [
+
+    "http://localhost:5173",
+]
+STEP 4: USER MODEL
+accounts/models.py
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class User(AbstractUser):
+
+    ROLE_CHOICES = (
+
+        ('admin','Admin'),
+        ('editor','Editor'),
+        ('viewer','Viewer'),
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='viewer'
+    )
+STEP 5: JWT AUTH
+settings.py
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    ),
+}
+accounts/urls.py
+from django.urls import path
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
+
+urlpatterns = [
+
+    path(
+        'login/',
+        TokenObtainPairView.as_view()
+    ),
+
+    path(
+        'refresh/',
+        TokenRefreshView.as_view()
+    ),
+]
+STEP 6: JOB MODEL
+jobs/models.py
+class Job(models.Model):
+
+    title = models.CharField(
+        max_length=100
+    )
+
+    department = models.CharField(
+        max_length=100
+    )
+
+    location = models.CharField(
+        max_length=100
+    )
+
+    salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+STEP 7: APPLICATION MODEL
+class Application(models.Model):
+
+    applicant_name = models.CharField(
+        max_length=100
+    )
+
+    email = models.EmailField()
+
+    resume_summary = models.TextField()
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    resume_score = models.IntegerField(
+        null=True
+    )
+
+    location_points = models.IntegerField(
+        null=True
+    )
+
+    final_score = models.IntegerField(
+        null=True
+    )
+
+    class Meta:
+
+        unique_together = (
+            'email',
+            'job'
+        )
+STEP 8: SCORING LOGIC
+jobs/services.py
+import random
+
+
+def calculate_score(job):
+
+    resume_score = random.randint(
+        1,
+        10
+    )
+
+    if job.location.lower() == 'remote':
+
+        location_points = 3
+
+    elif job.location.upper() == 'DAR ES SALAAM':
+
+        location_points = 2
+
+    else:
+
+        location_points = 1
+
+    final_score = (
+        resume_score +
+        location_points
+    )
+
+    return (
+        resume_score,
+        location_points,
+        final_score
+    )
+STEP 9: APPLY API
+jobs/views.py
+class ApplicationCreateView(
+    generics.CreateAPIView
+):
+    serializer_class = ApplicationSerializer
+
+Inside serializer:
+
+resume_score, location_points, final_score = (
+    calculate_score(job)
+)
+
+Save all scores.
+
+STEP 10: JOB LIST API
+class JobListView(
+    generics.ListAPIView
+):
+
+    queryset = Job.objects.filter(
+        is_active=True
+    )
+
+    serializer_class = JobSerializer
+REACT FRONTEND
+
+Now comes the easy part.
+
+STEP 11: AXIOS SETUP
+src/api.js
+import axios from "axios";
+
+export default axios.create({
+
+    baseURL:
+    "http://127.0.0.1:8000/api/",
+});
+STEP 12: LOGIN PAGE
+components/Login.jsx
+import { useState } from "react";
+import api from "../api";
+
+function Login() {
+
+    const [username,setUsername] =
+        useState("");
+
+    const [password,setPassword] =
+        useState("");
+
+    const login = async () => {
+
+        const res =
+            await api.post(
+                "auth/login/",
+                {
+                    username,
+                    password
+                }
+            );
+
+        localStorage.setItem(
+            "token",
+            res.data.access
+        );
+    };
+
+    return (
+        <>
+            <input
+                onChange={
+                    e =>
+                    setUsername(
+                        e.target.value
+                    )
+                }
+            />
+
+            <input
+                type="password"
+                onChange={
+                    e =>
+                    setPassword(
+                        e.target.value
+                    )
+                }
+            />
+
+            <button onClick={login}>
+                Login
+            </button>
+        </>
+    );
+}
+
+export default Login;
+STEP 13: FETCH JOBS
+components/JobList.jsx
+import { useEffect } from "react";
+import { useState } from "react";
+import api from "../api";
+
+function JobList() {
+
+    const [jobs,setJobs] =
+        useState([]);
+
+    useEffect(() => {
+
+        api.get("jobs/")
+           .then(res => {
+
+            setJobs(
+                res.data
+            );
+        });
+
+    }, []);
+
+    return (
+
+        <>
+        {
+            jobs.map(job => (
+
+                <div key={job.id}>
+
+                    <h3>
+                        {job.title}
+                    </h3>
+
+                    <p>
+                        {job.location}
+                    </p>
+
+                </div>
+            ))
+        }
+        </>
+    );
+}
+
+export default JobList;
+STEP 14: APPLY FORM
+components/ApplyForm.jsx
+import api from "../api";
+
+function ApplyForm({jobId}) {
+
+    const apply = async () => {
+
+        await api.post(
+            "applications/",
+            {
+
+                applicant_name:
+                "Ally Mdoka",
+
+                email:
+                "ally@gmail.com",
+
+                resume_summary:
+                "Python Developer",
+
+                job:
+                jobId
+            }
+        );
+
+        alert(
+            "Applied Successfully"
+        );
+    };
+
+    return (
+
+        <button onClick={apply}>
+            Apply
+        </button>
+    );
+}
+
+export default ApplyForm;
+HOW TO TEST DURING INTERVIEW
+Backend Test First
+Login
+POST
+
+/api/auth/login/
+{
+    "username":"admin",
+    "password":"123456"
+}
+
+Returns:
+
+{
+    "access":"JWT_TOKEN"
+}
+List Jobs
+GET
+
+/api/jobs/
+
+Returns:
+
+[
+    {
+        "id":1,
+        "title":"Software Engineer",
+        "location":"Remote"
+    }
+]
+Apply
+POST
+
+/api/applications/
+{
+    "applicant_name":"Ally Mdoka",
+    "email":"ally@gmail.com",
+    "resume_summary":"Python Developer",
+    "job":1
+}
+
+Returns:
+
+{
+    "resume_score":7,
+    "location_points":3,
+    "final_score":10
+}
