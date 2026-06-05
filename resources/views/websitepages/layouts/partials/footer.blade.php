@@ -44,11 +44,11 @@
                     <a href="{{ config('site.social.email') }}" class="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition" aria-label="Email">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                     </a>
-                    <a href="{{ config('site.social.instagram') }}" target="_blank" rel="noopener noreferrer" class="social-insta w-10 h-10 text-white rounded-full flex items-center justify-center" aria-label="Instagram">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    <a href="{{ config('site.social.instagram') }}" target="_blank" rel="noopener noreferrer" class="social-insta w-10 h-10 rounded-full text-white flex items-center justify-center" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <rect x="4" y="4" width="16" height="16" rx="4" stroke="white" stroke-width="1.85"/>
+                            <circle cx="12" cy="12" r="3.75" stroke="white" stroke-width="1.85"/>
+                            <circle cx="17" cy="7" r="1.1" fill="white" stroke="none"/>
                         </svg>
                     </a>
                 </div>

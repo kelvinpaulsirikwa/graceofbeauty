@@ -6,11 +6,18 @@
 }
 
 .social-insta {
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
     transition: opacity 0.25s ease, transform 0.25s ease;
+    flex-shrink: 0;
 }
 
 .social-insta:hover {
     opacity: 0.92;
     transform: translateY(-1px);
+}
+
+.social-insta svg {
+    width: 1.625rem;
+    height: 1.625rem;
 }
