@@ -5,3 +5,12 @@
     --gold-color-dark: #A0821A;
 }
 
+.social-insta {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.social-insta:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}

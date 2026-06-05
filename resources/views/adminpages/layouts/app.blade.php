@@ -12,7 +12,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>{{ config('site.name') }} | Admin {{ $pageTitle ?? 'Dashboard' }}</title>
-    <link rel="icon" href="{{ asset('/images/static_image/logonobg.png') }}" type="image/jpg">
+    <link rel="icon" href="{{ asset('images/static_image/logonobg.png') }}" type="image/png">
 
     <!-- Bootstrap CSS (Local) -->
     <link href="{{ asset('css/bootstrap/bootstrap.min.css') }}" rel="stylesheet">

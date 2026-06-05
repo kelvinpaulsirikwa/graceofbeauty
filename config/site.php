@@ -37,9 +37,9 @@ return [
 
     'social' => [
         'facebook' => env('SOCIAL_FACEBOOK', '#'),
-        'twitter' => env('SOCIAL_TWITTER', '#'),
-        'google' => env('SOCIAL_GOOGLE', '#'),
-        'instagram' => env('SOCIAL_INSTAGRAM', '#'),
+        'whatsapp' => env('SOCIAL_WHATSAPP', 'https://wa.me/255659920815'),
+        'email' => env('SOCIAL_EMAIL', 'mailto:janethmalikita@gmail.com'),
+        'instagram' => env('SOCIAL_INSTAGRAM', 'https://www.instagram.com/grace_of_beauty_?igsh=Z245NHprdjhqYmhr'),
         'youtube' => env('SOCIAL_YOUTUBE', '#'),
         'linkedin' => env('SOCIAL_LINKEDIN', '#'),
     ],

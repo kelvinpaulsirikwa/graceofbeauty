@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{ asset('/images/static_image/logo.jpg') }}" type="image/jpg">
+    <link rel="icon" href="{{ asset('images/static_image/logonobg.png') }}" type="image/png">
 
     <title>{{ config('site.name') }} - @yield('title', config('site.tagline'))</title>
 
