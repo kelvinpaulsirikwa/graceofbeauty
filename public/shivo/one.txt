@@ -1,0 +1,618 @@
+FINAL PROJECT STRUCTURE
+moi_api/
+│
+├── manage.py
+│
+├── moi_api/
+│   ├── settings.py
+│   ├── urls.py
+│
+├── accounts/
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│
+├── courses/
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+
+Why only 2 apps?
+
+accounts  -> users, login, registration
+courses   -> course + enrolment
+
+Easy to explain.
+
+STEP 1: CREATE PROJECT
+Command
+django-admin startproject moi_api
+
+cd moi_api
+
+python manage.py startapp accounts
+
+python manage.py startapp courses
+STEP 2: INSTALL PACKAGES
+Command
+pip install djangorestframework
+
+pip install djangorestframework-simplejwt
+
+pip install mysqlclient
+STEP 3: CONFIGURE SETTINGS
+File
+moi_api/settings.py
+Add apps
+INSTALLED_APPS = [
+
+    'rest_framework',
+
+    'accounts',
+    'courses',
+]
+Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'moi_db',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+JWT
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    ),
+}
+Custom User
+AUTH_USER_MODEL = 'accounts.User'
+Why?
+
+Tell interviewer:
+
+Since the system has Admin, Tutor and Learner, I need a custom user model.
+
+STEP 4: CREATE USER MODEL
+File
+accounts/models.py
+Code
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class User(AbstractUser):
+
+    ROLE_CHOICES = (
+        ('admin', 'Admin'),
+        ('tutor', 'Tutor'),
+        ('learner', 'Learner'),
+    )
+
+    GENDER_CHOICES = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+    )
+
+    fullname = models.CharField(max_length=100)
+
+    gender = models.CharField(
+        max_length=10,
+        choices=GENDER_CHOICES
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='learner'
+    )
+Why?
+
+Question requires:
+
+Learner
+id
+fullname
+password
+gender
+role
+created_at
+
+Django already gives:
+
+id
+password
+date_joined
+
+You only add:
+
+fullname
+gender
+role
+
+This saves time.
+
+STEP 5: CREATE COURSE MODEL
+File
+courses/models.py
+Code
+from django.db import models
+from accounts.models import User
+
+
+class Course(models.Model):
+
+    PROGRAM_CHOICES = (
+
+        ('certificate', 'Certificate'),
+        ('diploma', 'Diploma'),
+    )
+
+    STATUS_CHOICES = (
+
+        ('active', 'Active'),
+        ('withdraw', 'Withdraw'),
+    )
+
+    title = models.CharField(max_length=100)
+
+    course_code = models.CharField(
+        max_length=20,
+        unique=True
+    )
+
+    tutor = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    capacity = models.IntegerField()
+
+    program = models.CharField(
+        max_length=20,
+        choices=PROGRAM_CHOICES
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+Why?
+
+This directly satisfies:
+
+Course
+title
+program
+course_code
+tutor
+capacity
+status
+STEP 6: CREATE ENROLMENT MODEL
+File
+courses/models.py
+
+Below Course model.
+
+class Enrolment(models.Model):
+
+    learner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    is_deleted = models.BooleanField(
+        default=False
+    )
+
+    class Meta:
+
+        unique_together = (
+            'learner',
+            'course'
+        )
+Why add is_deleted?
+
+Interview question:
+
+justify hard delete or soft delete
+
+Use soft delete.
+
+is_deleted=True
+
+instead of deleting.
+
+Answer:
+
+Academic systems require audit history.
+
+STEP 7: RUN MIGRATIONS
+Command
+python manage.py makemigrations
+
+python manage.py migrate
+
+At this point database tables exist.
+
+STEP 8: USER REGISTRATION SERIALIZER
+File
+accounts/serializers.py
+from rest_framework import serializers
+from .models import User
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = User
+
+        fields = (
+            'id',
+            'fullname',
+            'username',
+            'password',
+            'gender',
+            'role'
+        )
+
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def validate_role(self, value):
+
+        if value in ['admin', 'tutor']:
+
+            raise serializers.ValidationError(
+                "Cannot assign admin/tutor role"
+            )
+
+        return value
+
+    def create(self, validated_data):
+
+        return User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+            fullname=validated_data['fullname'],
+            gender=validated_data['gender'],
+            role='learner'
+        )
+Why?
+
+Question says:
+
+Learner should not assign himself Admin or Tutor role
+
+This validation solves it.
+
+STEP 9: REGISTRATION API
+File
+accounts/views.py
+from rest_framework import generics
+from .serializers import RegisterSerializer
+
+
+class RegisterView(
+    generics.CreateAPIView
+):
+
+    serializer_class = RegisterSerializer
+Why?
+
+Creates user.
+
+Simple.
+
+Only 4 lines.
+
+STEP 10: JWT LOGIN
+
+No custom login view needed.
+
+Use SimpleJWT.
+
+File
+accounts/urls.py
+from django.urls import path
+
+from .views import RegisterView
+
+from rest_framework_simplejwt.views import (
+
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+
+    path(
+        'register/',
+        RegisterView.as_view()
+    ),
+
+    path(
+        'login/',
+        TokenObtainPairView.as_view()
+    ),
+
+    path(
+        'refresh/',
+        TokenRefreshView.as_view()
+    ),
+]
+Why?
+
+Saves 30 minutes.
+
+Interviewer likes this answer:
+
+I reused Django REST Framework JWT endpoints instead of writing authentication logic from scratch.
+
+STEP 11: COURSE SERIALIZER
+File
+courses/serializers.py
+from rest_framework import serializers
+from .models import Course
+
+
+class CourseSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = Course
+
+        fields = '__all__'
+STEP 12: COURSE CRUD
+File
+courses/views.py
+from rest_framework.viewsets import ModelViewSet
+from .models import Course
+from .serializers import CourseSerializer
+
+
+class CourseViewSet(ModelViewSet):
+
+    queryset = Course.objects.all()
+
+    serializer_class = CourseSerializer
+STEP 13: ADMIN ONLY COURSE CREATION
+
+Inside CourseViewSet
+
+def perform_create(
+    self,
+    serializer
+):
+
+    if self.request.user.role != 'admin':
+
+        raise PermissionDenied(
+            "Only admin allowed"
+        )
+
+    serializer.save()
+Why?
+
+Question says:
+
+Courses added by Admin only
+STEP 14: ENROLMENT SERIALIZER
+File
+courses/serializers.py
+
+Add below CourseSerializer.
+
+from .models import Enrolment
+class EnrolmentSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = Enrolment
+
+        fields = '__all__'
+
+    def validate(self, data):
+
+        course = data['course']
+
+        count = Enrolment.objects.filter(
+            course=course,
+            is_deleted=False
+        ).count()
+
+        if count >= course.capacity:
+
+            raise serializers.ValidationError(
+                "Course full"
+            )
+
+        return data
+Why?
+
+Question says:
+
+Capacity reached -> no enrolment
+
+This is where you enforce it.
+
+STEP 15: ENROLMENT CRUD
+File
+courses/views.py
+class EnrolmentViewSet(
+    ModelViewSet
+):
+
+    serializer_class = EnrolmentSerializer
+Role-based listing
+def get_queryset(self):
+
+    user = self.request.user
+
+    if user.role == 'admin':
+
+        return Enrolment.objects.filter(
+            is_deleted=False
+        )
+
+    elif user.role == 'tutor':
+
+        return Enrolment.objects.filter(
+            course__tutor=user,
+            is_deleted=False
+        )
+
+    return Enrolment.objects.filter(
+        learner=user,
+        is_deleted=False
+    )
+Why?
+
+Question says:
+
+Everyone sees enrolments according to role
+
+Admin:
+
+all enrolments
+
+Tutor:
+
+enrolments in his courses
+
+Learner:
+
+his enrolments only
+STEP 16: SOFT DELETE
+
+Inside EnrolmentViewSet
+
+def perform_destroy(
+    self,
+    instance
+):
+
+    instance.is_deleted = True
+
+    instance.save()
+Interview explanation
+
+Instead of:
+
+instance.delete()
+
+We do:
+
+instance.is_deleted = True
+
+Because:
+
+Academic records must remain available for auditing.
+STEP 17: URLS
+File
+courses/urls.py
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+
+router.register(
+    'courses',
+    CourseViewSet
+)
+
+router.register(
+    'enrolments',
+    EnrolmentViewSet
+)
+Root URLs
+File
+moi_api/urls.py
+from django.urls import path, include
+
+urlpatterns = [
+
+    path(
+        'api/auth/',
+        include('accounts.urls')
+    ),
+
+    path(
+        'api/',
+        include('courses.urls')
+    ),
+]
+What the Interviewer Wants to Hear
+
+After finishing, summarize:
+
+Business Rule 1
+
+✔ Learner cannot self-assign Admin/Tutor.
+
+Implemented in:
+
+RegisterSerializer
+Business Rule 2
+
+✔ JWT Authentication.
+
+Implemented using:
+
+SimpleJWT
+Business Rule 3
+
+✔ Course capacity check.
+
+Implemented in:
+
+EnrolmentSerializer.validate()
+Business Rule 4
+
+✔ Admin only creates courses.
+
+Implemented in:
+
+CourseViewSet.perform_create()
+Business Rule 5
+
+✔ Role-based enrolment visibility.
+
+Implemented in:
+
+EnrolmentViewSet.get_queryset()
+Business Rule 6
+
+✔ Soft delete.
+
+Implemented using:
+
+is_deleted
+
+If you can implement up to Step 15 comfortably and explain each decision, you'll demonstrate Django, DRF, JWT, MySQL, permissions, validation, and API design skills—the exact areas PSRS interviewers are usually testing.
